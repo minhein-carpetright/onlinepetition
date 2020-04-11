@@ -1,0 +1,26 @@
+<div class="placeholder"></div>
+<p>text to explain the cause. text to explain the cause. text to explain the cause. text to explain the cause. text to explain the cause. text to explain the cause. text to explain the cause. text to explain the cause. text to explain the cause. text to explain the cause. text to explain the cause. text to explain the cause. text to explain the cause. text to explain the cause. text to explain the cause. text to explain the cause. text to explain the cause. text to explain the cause</p>
+<p>text to explain the cause. text to explain the cause. text to explain the cause. text to explain the cause. text to explain the cause. text to explain the cause. text to explain the cause. text to explain the cause. text to explain the cause. text to explain the cause. text to explain the cause. text to explain the cause. text to explain the cause. text to explain the cause. text to explain the cause. text to explain the cause. text to explain the cause. text to explain the cause</p>
+<h3>Sign here to support our cause</h3>
+
+<form method="POST" id='clicks'>
+    <div id="firstlastname">
+        <input id="first" name="first" placeholder="enter first name" type="text" autocomplete="off" />
+        <input id="last" name="last" placeholder="enter last name" type="text" autocomplete="off" />
+    </div>
+
+    <div id="canvascontainer">
+        <canvas></canvas>
+        <input id="signature" name="signature" value="" /> {{!-- type="hidden"  --}}
+        <p id="signhere">your signature</p>
+    </div>
+
+{{#if error}}
+    <h4>Something went wrong. Please fill in all 3 fields.</h4>
+{{/if}}
+
+    <button id="submit-btn">Sign up</button>
+</form>
+
+
+{{!-- There should also be a <canvas> element on which users can draw their signature. --}}
