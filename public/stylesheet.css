@@ -97,7 +97,7 @@ h4 {
 
 #first,
 #last {
-    width: 240px;
+    width: 24%;
     padding: 10px;
     border: 1px solid black;
     border-radius: 5px;
@@ -112,8 +112,9 @@ h4 {
 
 canvas {
     border: 2px dotted black;
-    width: 500px;
+    width: 24%;
     height: 70px;
+    /* left: 69%; */
     border-radius: 10px;
     background-color: white;
 }
@@ -136,6 +137,7 @@ canvas {
     border: 2px solid grey;
     border-radius: 25px;
     margin-top: 30px;
+    cursor: pointer;
 }
 
 #submit-btn:hover {
@@ -144,7 +146,7 @@ canvas {
 }
 
 #submit-btn:active {
-    top: 2px;
+    transform: translateY(2px);
 }
 
 #submit-btn:focus {
@@ -188,11 +190,11 @@ i.fa.fa-twitter::before {
 }
 
 #back {
-    /* width: 50%; */
     text-align: none;
-    /* float: left; */
     margin: 5px;
     color: black;
+    /* width: 50%; */
+    /* float: left; */
 }
 
 #copyright {

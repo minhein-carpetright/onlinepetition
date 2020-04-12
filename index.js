@@ -6,17 +6,21 @@ app.set("view engine", "handlebars");
 const cookieParser = require("cookie-parser");
 const db = require("./db.js");
 
-///// MIDDLEWARE /////
+//////////////////// MIDDLEWARE ////////////////////
 app.use(express.static("./public"));
 
 app.use(cookieParser());
 
 app.use(
     express.urlencoded({
-        // read req.body, parses
         extended: false,
-    })
+    }) // read req.body, parses
 );
+
+app.use(function (err, req, res, next) {
+    console.error("error in middleware:", err.stack);
+    res.status(500).send("Something broke, status code 500!");
+});
 
 // redirect to petition if on main site
 app.get("/", (req, res) => {
@@ -24,8 +28,8 @@ app.get("/", (req, res) => {
     console.log("GET request to main site -> redirected to /petition");
 });
 
-///// PETITION SITE /////
-// cookie-check
+//////////////////// PETITION SITE ////////////////////
+// if cookie redirect to /thanks
 app.get("/petition", (req, res) => {
     if (!req.cookies.signed) {
         res.render("petition", {
@@ -37,11 +41,8 @@ app.get("/petition", (req, res) => {
     }
 });
 
-// get data from 3 input fields
+// get data from 3 input fields, add to database, set cookie and redirect
 app.post("/petition", (req, res) => {
-    // console.log("req.body.first:", req.body.first);
-    // console.log("req.body.last:", req.body.last);
-    // console.log("req.body.signature:", req.body.signature);
     let first = req.body.first;
     let last = req.body.last;
     let signature = req.body.signature;
@@ -51,7 +52,6 @@ app.post("/petition", (req, res) => {
         db.addSignee(first, last, signature) // add to database
             .then(() => {
                 console.log("values from 3 input fields added to database");
-                q;
             })
             .catch((err) => {
                 console.log("error, not all 3 fields filled out:", err);
@@ -71,24 +71,8 @@ app.post("/petition", (req, res) => {
     }
 });
 
-// app.get("/thanks", (req, res) => {
-//     db.getFullNames(`SELECT first FROM signatures`)
-//         .then((results) => {
-//             let nameArr = [];
-//             for (let i = 0; i < results.rows.length; i++) {
-//                 let completName = results.rows[i].first;
-//                 nameArr.push(completName);
-//             }
-//             console.log("results.rows:", results.rows);
-//             console.log("nameArr:", nameArr);
-//             console.log("YAY!");
-//         })
-//         .catch((err) => {
-//             console.log("error in getValues amount:", err);
-//         });
-// });
-
-/// THANKS SITE /////
+//////////////////// THANKS SITE ////////////////////
+// if no cookie redirect to /petition
 app.get("/thanks", (req, res) => {
     if (!req.cookies.signed) {
         res.redirect("/petition");
@@ -96,12 +80,10 @@ app.get("/thanks", (req, res) => {
             "GET request to /thanks without cookie -> redirect to /petition"
         );
     } else {
+        // thank signee and show number of signees
         console.log("GET request to /thanks with cookie");
-        db.getValues(`SELECT COUNT(id) FROM signatures`)
+        db.getNumberOfSignees()
             .then((results) => {
-                // console.log("1:", results.rows.length);
-                // console.log("2:", results.rows[15]);
-
                 res.render("thanks", {
                     layout: "main",
                     amountOfSigners: results.rows[0].count,
@@ -109,12 +91,13 @@ app.get("/thanks", (req, res) => {
                 console.log("amount of signers:", results.rows[0].count);
             })
             .catch((err) => {
-                console.log("error in getValues amount:", err);
+                console.log("error in getNumberOfSignees amount:", err);
             });
     }
 });
 
-///// SIGNERS SITE /////
+//////////////////// SIGNERS SITE ////////////////////
+// if no cookie redirect to /petition
 app.get("/signers", (req, res) => {
     if (!req.cookies.signed) {
         res.redirect("/petition");
@@ -122,8 +105,9 @@ app.get("/signers", (req, res) => {
             "GET request to /signers without cookie -> redirect to /petition"
         );
     } else {
+        // show signee first and last names of other signees
         console.log("GET request to /signers with cookie");
-        db.getValues(`SELECT first, last FROM signatures`)
+        db.getFullNamesOfSignees()
             .then((results) => {
                 // loop through table-names and push them into an array
                 let namesArr = [];
@@ -134,38 +118,19 @@ app.get("/signers", (req, res) => {
                 }
                 // console.log("results.rows:", results.rows);
                 // console.log("namesArr:", namesArr);
-
                 res.render("signers", {
                     layout: "main",
                     fullNames: namesArr,
                 });
             })
             .catch((err) => {
-                console.log("error in getValues names:", err);
+                console.log("error in getFullNamesOfSignees:", err);
             });
     }
 });
 
-// const a = db
-//     .getFullNames(`SELECT first FROM signatures`)
-//     .then((results) => {
-//         console.log("results important:", results);
-//         console.log("results.rows important:", results.rows);
-//     })
-//     .catch((err) => {
-//         console.log("error in getFullNames:", err);
-//     });
-// console.log("a:", a);
-
-// const b = db
-//     .getLastName(`SELECT last FROM signatures`)
-//     .then((results) => {
-//         console.log("results important 2:", results);
-//         console.log("results.rows important 2:", results.rows);
-//     })
-//     .catch((err) => {
-//         console.log("error in getLastName:", err);
-//     });
-// console.log("b:", b);
+app.use(function (req, res, next) {
+    res.status(404).send("sorry can't find that, 404");
+});
 
 app.listen(8080, () => console.log("petition server is listening"));
