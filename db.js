@@ -9,10 +9,9 @@ module.exports.addSignee = (first, last, signature) => {
     VALUES ($1, $2, $3)`,
         [first, last, signature]
     );
-};
-
-module.exports.getValues = (query) => {
-    return db.query(query);
+    console.log(first, last, signature);
+    console.log([first, last, signature]);
+    console.log($1, $2, $3);
 };
 
 module.exports.getNumberOfSignees = () => {
@@ -24,24 +23,25 @@ module.exports.getFullNamesOfSignees = () => {
 };
 
 // EXPORT BY FIRST NAME (if firstName is inserted I get every row with that name)
-module.exports.getByFirstName = (firstName) => {
-    return db.query(`SELECT * FROM signatures WHERE first = $1`, [firstName]);
-};
-
-// EXPORT BY LAST NAME (if lastName is inserted I get every row with that name)
-module.exports.getByLastName = (lastName) => {
-    return db.query(`SELECT * FROM signatures WHERE last = $1`, [lastName]);
-};
+// module.exports.getByFirstName = (firstName) => {
+//     return db.query(`SELECT * FROM signatures WHERE first = $1`, [firstName]);
+// };
 
 // EXPORT BY ID (if id is inserted I get the whole row)
-module.exports.getById = (id) => {
-    return db.query(`SELECT * FROM signatures WHERE id = $1`, [id]);
-};
+// module.exports.getById = (id) => {
+//     return db.query(`SELECT * FROM signatures WHERE id = $1`, [id]);
+// };
+
+// GETS EVERYTHING FROM THE DATABASE
+// module.exports.getValues = (query) => {
+//     return db.query(query);
+// };
 
 // DATA OF LAST/HIGHEST ID
 // SELECT * FROM signatures ORDER BY id DESC LIMIT 1
 // DESC = descending
-// can be done in db.js (or index.js):
+// LIMIT 1: just one index
+// can also be done in index.js
 // module.exports.getHighestId = () => {
 //     return db.query(`SELECT * FROM signatures ORDER BY id DESC LIMIT 1`);
 // };
