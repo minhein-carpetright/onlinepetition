@@ -13,6 +13,7 @@
         <canvas id="canvas" width="700px" height="100px"></canvas>
         <p id="signhere">your signature</p>
         <input id="signature" name="signature" value="" type="hidden"/>
+        <input type="hidden" name="_csrf" value="{{csrfToken}}">
     </div>
 
 {{#if error}}

@@ -2,11 +2,13 @@ const spicedPg = require("spiced-pg");
 const db = spicedPg("postgres:postgres:postgres@localhost:5432/petition");
 // db is an object, has one method: query()
 
+// INSERT FIRST AND LAST NAME AND SIGNATURE INTO DATABASE
 module.exports.addSignee = (first, last, signature) => {
     return db.query(
         `
     INSERT INTO signatures (first, last, signature)
-    VALUES ($1, $2, $3)`,
+    VALUES ($1, $2, $3)
+    RETURNING id;`,
         [first, last, signature]
     );
     console.log(first, last, signature);
@@ -14,22 +16,39 @@ module.exports.addSignee = (first, last, signature) => {
     console.log($1, $2, $3);
 };
 
+// RETURN NUMBER OF SIGNEES
 module.exports.getNumberOfSignees = () => {
-    return db.query(`SELECT COUNT(id) FROM signatures`);
+    return db.query(`SELECT COUNT(id) FROM signatures`).then((result) => {
+        return result.rows[0].count;
+    });
 };
 
+// RETURN FIRST AND LAST NAMES
 module.exports.getFullNamesOfSignees = () => {
     return db.query(`SELECT first, last FROM signatures`);
+};
+
+// RETURN SIGNATURE OF CURRENT/LAST ID
+module.exports.getCurrentSignatureById = (id) => {
+    return db
+        .query(`SELECT signature FROM signatures WHERE id = $1`, [id])
+        .then((result) => {
+            return result.rows[0].signature;
+        });
+};
+
+// RETURN FIRST NAME OF CURRENT/LAST ID
+module.exports.getCurrentFirstNameById = (id) => {
+    return db
+        .query(`SELECT first FROM signatures WHERE id = $1`, [id])
+        .then((result) => {
+            return result.rows[0].first;
+        });
 };
 
 // EXPORT BY FIRST NAME (if firstName is inserted I get every row with that name)
 // module.exports.getByFirstName = (firstName) => {
 //     return db.query(`SELECT * FROM signatures WHERE first = $1`, [firstName]);
-// };
-
-// EXPORT BY ID (if id is inserted I get the whole row)
-// module.exports.getById = (id) => {
-//     return db.query(`SELECT * FROM signatures WHERE id = $1`, [id]);
 // };
 
 // GETS EVERYTHING FROM THE DATABASE

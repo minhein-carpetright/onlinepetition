@@ -22,7 +22,7 @@ canvas
             const offset = canvas[0].getBoundingClientRect();
             let x = e.clientX - offset.left;
             let y = e.clientY - offset.top;
-            // ctx.strokeStyle = "black";
+            ctx.strokeStyle = "blue";
             ctx.lineTo(x, y);
             ctx.stroke();
         }
