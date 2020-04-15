@@ -1,14 +1,20 @@
 const express = require("express");
 const app = express();
 const hb = require("express-handlebars");
-app.engine("handlebars", hb());
-app.set("view engine", "handlebars");
 const cookieSession = require("cookie-session");
 const { addEntry } = require("./db.js");
 const db = require("./db.js");
 const csurf = require("csurf");
+const { hash, compare } = require("./bc");
+const helmet = require("helmet");
+
+//////////////////// HANDLEBARS BOILERPLATE ////////////////////
+app.engine("handlebars", hb());
+app.set("view engine", "handlebars");
 
 //////////////////// MIDDLEWARE ////////////////////
+app.use(helmet());
+
 app.use(
     express.urlencoded({
         extended: false,
@@ -41,8 +47,132 @@ app.use(function (err, req, res, next) {
 
 // redirect to petition if on main site
 app.get("/", (req, res) => {
-    res.redirect("/petition");
-    console.log("GET request to root route -> redirected to /petition");
+    res.redirect("/register");
+    console.log("GET request to root route -> redirected to /register");
+});
+
+//////////////////// REGISTER SITE ////////////////////
+app.get("/register", (req, res) => {
+    console.log("GET request to register site");
+    // const { user } = req.session;
+
+    // if (user) {
+    //     res.redirect("/petition");
+    //     console.log("has cookie, redirect from /login to /petition");
+    // } else {
+    //     res.render("login");
+    // }
+    res.render("register");
+});
+
+// get first, last, email and password and add to database, set cookie and redirect
+app.post("/register", (req, res) => {
+    let first = req.body.first;
+    let last = req.body.last;
+    let email = req.body.email;
+    let password = req.body.password;
+
+    if (first != "" && last != "" && email != "" && password != "") {
+        hash(password)
+            .then((hashedPw) => {
+                console.log("password hashed in /register:", hashedPw);
+                return db.addUser(first, last, email, hashedPw);
+            })
+            .then((response) => {
+                req.session.user = {
+                    firstName: first,
+                    lastName: last,
+                    sigId: response.rows[0].id,
+                };
+                res.redirect("/petition");
+                console.log(
+                    "registration successful, 4 input fields added to database, cookie user set, redirect to /petition"
+                );
+            })
+            .catch((err) => {
+                console.log("error in POST register:", err);
+                res.render("register", { error: true });
+            });
+    } else {
+        res.render("register", {
+            error: true,
+        });
+        console.log("4 input fields on /register not complete");
+    }
+});
+
+//////////////////// LOGIN SITE ////////////////////
+
+app.get("/login", (req, res) => {
+    console.log("GET request to login site");
+    // const { user } = req.session;
+    // if (user) {
+    //     res.redirect("/petition");
+    //     console.log("has cookie, redirect from /login to /petition");
+    // } else {
+    res.render("login");
+    // }
+});
+
+app.post("/login", (req, res) => {
+    let email = req.body.email;
+    let password = req.body.password;
+    const { user } = req.session;
+    let id;
+    console.log("email:", email);
+    console.log("password:", password);
+
+    if (email != "" && password != "") {
+        // grab stored hash from the database to the corresponding email
+        db.getHashByEmail(email)
+            .then((result) => {
+                id = result.rows[0].id;
+                return result.rows[0].password;
+            })
+            // compare hash with login-password
+            .then((hashedPw) => {
+                return compare(password, hashedPw);
+            })
+            .then((matchValue) => {
+                console.log("match value of compare:", matchValue);
+                if (matchValue) {
+                    // user.sigId = id;
+                    // req.session.user.sigId = result.rows[0].id;
+                    // req.session.user.sigId = matchValue.rows[0].id; // store user id in cookie "user"
+                    // console.log(
+                    //     "req.session.user.sigId:",
+                    //     req.session.user.sigId
+                    // );
+                    res.redirect("/petition");
+                    console.log(
+                        "hash and entered password match -> redirect to /petition"
+                    );
+                } else {
+                    // if matchValue is false -> rerender login with error message
+                    res.render("login", {
+                        errorpassword: true,
+                    });
+                    console.log(
+                        "error in login, hash and password do not match"
+                    );
+                }
+                // you will want to redirect to /petition or /thankyou depending on your data flow;
+                // do a db query to find out if they've signed
+                // if yes, you want to put their sigId in a cookie & redirect to /thanks
+            })
+            // if matchValue is false -> rerender
+            .catch((err) => {
+                res.render("login", {
+                    error: true,
+                });
+                console.log("error in login", err);
+            });
+    } else {
+        res.render("login", {
+            error: true,
+        });
+        console.log("2 input fields on /login not complete");
+    }
 });
 
 //////////////////// PETITION SITE ////////////////////
@@ -56,14 +186,13 @@ app.get("/petition", (req, res) => {
     console.log("GET request to petition site");
 });
 
-// get data from 3 input fields, add to database, set cookie and redirect
+// get signature and add to database, set cookie and redirect
+// !!! alter your route so that you pass user from the cookie to your query instead of first and last name !!!
 app.post("/petition", (req, res) => {
-    let first = req.body.first;
-    let last = req.body.last;
     let signature = req.body.signature;
 
-    if (first != "" && last != "" && signature != "") {
-        db.addSignee(first, last, signature)
+    if (signature != "") {
+        db.addSignee(signature)
             .then((response) => {
                 req.session.currentId = response.rows[0].id; // set cookie on current id
                 // console.log("current value of currentId cookie:", response.rows[0].id);

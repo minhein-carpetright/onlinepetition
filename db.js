@@ -2,30 +2,47 @@ const spicedPg = require("spiced-pg");
 const db = spicedPg("postgres:postgres:postgres@localhost:5432/petition");
 // db is an object, has one method: query()
 
-// INSERT FIRST AND LAST NAME AND SIGNATURE INTO DATABASE
-module.exports.addSignee = (first, last, signature) => {
+// INSERT FIRST AND LAST NAME, EMAIL AND PASSWORD INTO DATABASE "USERS"
+module.exports.addUser = (first, last, email, password) => {
     return db.query(
         `
-    INSERT INTO signatures (first, last, signature)
-    VALUES ($1, $2, $3)
+    INSERT INTO users (first, last, email, password)
+    VALUES ($1, $2, $3, $4)
     RETURNING id;`,
-        [first, last, signature]
+        [first, last, email, password]
     );
-    console.log(first, last, signature);
-    console.log([first, last, signature]);
-    console.log($1, $2, $3);
+};
+
+// INSERT SIGNATURE INTO DATABASE "SIGNATURES"
+module.exports.addSignee = (signature, user_id) => {
+    return db.query(
+        `
+    INSERT INTO signatures (signature, user_id)
+    VALUES ($1, $2)
+    RETURNING id;`,
+        [signature, user_id]
+    );
+};
+
+// RETURN HASH OF USERS FOR COMPARISON
+module.exports.getHashByEmail = (email) => {
+    // return db.query(`SELECT * FROM users WHERE email = $1`, [email]);
+    return db.query(`SELECT password, id FROM users WHERE email = $1`, [email]);
+    // .then((result) => {
+    //     return result.rows[0].password;
+    // });
 };
 
 // RETURN NUMBER OF SIGNEES
 module.exports.getNumberOfSignees = () => {
-    return db.query(`SELECT COUNT(id) FROM signatures`).then((result) => {
+    return db.query(`SELECT COUNT(id) FROM users`).then((result) => {
         return result.rows[0].count;
     });
 };
 
 // RETURN FIRST AND LAST NAMES
 module.exports.getFullNamesOfSignees = () => {
-    return db.query(`SELECT first, last FROM signatures`);
+    return db.query(`SELECT first, last FROM users`);
 };
 
 // RETURN SIGNATURE OF CURRENT/LAST ID
@@ -40,7 +57,7 @@ module.exports.getCurrentSignatureById = (id) => {
 // RETURN FIRST NAME OF CURRENT/LAST ID
 module.exports.getCurrentFirstNameById = (id) => {
     return db
-        .query(`SELECT first FROM signatures WHERE id = $1`, [id])
+        .query(`SELECT first FROM users WHERE id = $1`, [id])
         .then((result) => {
             return result.rows[0].first;
         });

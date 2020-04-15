@@ -4,6 +4,7 @@ const canvas = $("canvas");
 // add [0] to get the DOM object:
 const ctx = canvas[0].getContext("2d");
 const body = $("body");
+const clear = $("#clear");
 const signature = $("#signature");
 let mousedown = false;
 
@@ -40,4 +41,10 @@ canvas
 body.on("mouseup", (e) => {
     mousedown = false;
     e.stopPropagation();
+});
+
+clear.on("click", () => {
+    console.log("click clear");
+    ctx.clearRect(0, 0, canvas[0].width, canvas[0].height);
+    signatureUrl = null; // does "false" also work?
 });

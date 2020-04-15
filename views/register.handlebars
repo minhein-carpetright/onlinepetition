@@ -1,0 +1,20 @@
+short context info about petition<br>
+Register for a world without algorithmic bias<br>
+Every vote supports the cause for a fair and just ...<br>
+
+{{#if error}}
+    <h4>Something went wrong. Please fill out all 4 fields.</h4>
+{{/if}}
+
+<form method="POST" id="registerfields">
+    <div id="fourfields">
+        <input id="first" name="first" placeholder="enter first name" type="text" autocomplete="off" />
+        <input id="last" name="last" placeholder="enter last name" type="text" autocomplete="off" />
+        <input id="email-register" name="email" placeholder="enter email address" type="text" autocomplete="off" />
+        <input id="password-register" name="password" placeholder="enter password" type="text" autocomplete="off" />
+        <input type="hidden" name="_csrf" value="{{csrfToken}}">
+    </div>
+    <button id="register-button">register</button>
+</form>
+
+Already registered? Just <a href="/login">log in</a>
