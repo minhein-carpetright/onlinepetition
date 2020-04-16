@@ -47,10 +47,11 @@ module.exports.getFullNamesOfSignees = () => {
 };
 
 // RETURN SIGNATURE OF CURRENT/LAST ID
-module.exports.getCurrentSignatureById = (id) => {
+module.exports.getCurrentSignatureById = (user_id) => {
     return db
-        .query(`SELECT signature FROM signatures WHERE id = $1`, [id])
+        .query(`SELECT signature FROM signatures WHERE user_id = $1`, [user_id])
         .then((result) => {
+            // return result.rows[0].signature;
             return result.rows[0].signature;
         });
 };
@@ -60,7 +61,8 @@ module.exports.getCurrentFirstNameById = (id) => {
     return db
         .query(`SELECT first FROM users WHERE id = $1`, [id])
         .then((result) => {
-            return result.rows[0].first;
+            // return result.rows[0].first;
+            return result.rows[0];
         });
 };
 

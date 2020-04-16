@@ -181,19 +181,13 @@ app.get("/petition", (req, res) => {
 // get signature and add to database, set cookie and redirect
 app.post("/petition", (req, res) => {
     let signature = req.body.signature;
-    console.log("req.body.signature:", req.body.signature);
-    console.log("req.session:", req.session);
-    console.log("req.session.user:", req.session.user);
-    console.log("req.session.user.id:", req.session.user.id);
     let user_id = req.session.user.id;
     console.log("user_id:", user_id);
-    let id;
 
     if (signature != "") {
         db.addSignee(signature, user_id)
             .then((response) => {
-                req.session.user = { idSig: response.rows[0].id }; // set cookie
-                // console.log("current value of sigId cookie:", response.rows[0].id);
+                req.session.user.idSig = response.rows[0].id; // set cookie
                 console.log(
                     "cookie after /petition POST-request:",
                     req.session.user
@@ -216,19 +210,22 @@ app.post("/petition", (req, res) => {
 });
 
 //////////////////// THANKS SITE ////////////////////
+// thank signee and show number of signees and signature
 app.get("/thanks", (req, res) => {
-    // thank signee and show number of signees and signature
-    const { sigId } = req.session;
+    console.log("GET request to /thanks with cookies");
     let currentFirstName;
     let amountOfSignees;
     let currentSignature;
+    let idSig = req.session.user.idSig;
+    console.log("idSig:", idSig);
+    let id = req.session.user.id;
+    console.log("id:", id);
 
-    if (sigId) {
-        console.log("GET request to /thanks with cookies");
-
-        db.getCurrentFirstNameById(sigId)
+    if (req.session.user.idSig) {
+        db.getCurrentFirstNameById(id)
             .then((result) => {
-                currentFirstName = result;
+                console.log("result:", result);
+                currentFirstName = result.first;
                 console.log("current first name:", currentFirstName);
             })
             .catch((err) => {
@@ -244,11 +241,12 @@ app.get("/thanks", (req, res) => {
                 console.log("error in getNumberOfSignees amount:", err);
             });
 
-        db.getCurrentSignatureById(sigId)
+        db.getCurrentSignatureById(idSig)
             .then((result) => {
+                console.log("result of getCurrentSignatureById:", result);
                 currentSignature = result;
                 console.log("current signature:", currentSignature);
-                // render current first name, amount of signees and current signature
+                // render current first name, amount of signees and current signature:
                 res.render("thanks", {
                     cfn: currentFirstName,
                     amount: amountOfSignees,
@@ -261,7 +259,7 @@ app.get("/thanks", (req, res) => {
     } else {
         // if no cookie redirect to /petition
         console.log(
-            "GET request to /thanks without cookie -> redirect to /petition"
+            "GET request to /thanks without signature cookie -> redirect to /petition"
         );
         res.redirect("/petition");
     }
