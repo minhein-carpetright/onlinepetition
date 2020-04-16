@@ -27,10 +27,11 @@ module.exports.addSignee = (signature, user_id) => {
 // RETURN HASH OF USERS FOR COMPARISON
 module.exports.getHashByEmail = (email) => {
     // return db.query(`SELECT * FROM users WHERE email = $1`, [email]);
-    return db.query(`SELECT password, id FROM users WHERE email = $1`, [email]);
-    // .then((result) => {
-    //     return result.rows[0].password;
-    // });
+    return db
+        .query(`SELECT password, id FROM users WHERE email = $1`, [email])
+        .then((result) => {
+            return result.rows[0];
+        });
 };
 
 // RETURN NUMBER OF SIGNEES
