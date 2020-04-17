@@ -56,7 +56,10 @@ app.get("/register", (req, res) => {
     console.log("GET request to register site");
     if (req.session.user) {
         res.redirect("/petition");
-        console.log("has cookie, redirect from /login to /petition");
+        console.log(
+            "has cookie, redirect from /login to /petition, cookie:",
+            req.session.user
+        );
     } else {
         res.render("register");
     }
@@ -78,14 +81,18 @@ app.post("/register", (req, res) => {
             })
             .then((response) => {
                 req.session.user = {
+                    // set cookie "user"
                     firstName: first,
                     lastName: last,
                     id: response.rows[0].id,
                 };
-                console.log("cookie 'user':", req.session.user);
-                res.redirect("/petition");
                 console.log(
-                    "registration successful, 4 input fields added to database, cookie user set, redirect to /petition"
+                    "cookie 'user' in POST /register:",
+                    req.session.user
+                );
+                res.redirect("/profile");
+                console.log(
+                    "registration successful, 4 input fields added to database, cookie user set, redirect to /profile"
                 );
             })
             .catch((err) => {
@@ -100,10 +107,59 @@ app.post("/register", (req, res) => {
     }
 });
 
+//////////////////// PROFILE SITE ////////////////////
+app.get("/profile", (req, res) => {
+    console.log("GET request to profile site");
+    if (!req.session.user) {
+        res.redirect("/register");
+        console.log(
+            "has no cookie, redirect from /profile to /register, cookie:",
+            req.session.user
+        );
+    } else {
+        res.render("profile");
+        console.log("cookie 'user' in GET /profile:", req.session.user);
+    }
+});
+
+app.post("/profile", (req, res) => {
+    const age = req.body.age;
+    const city = req.body.city;
+    const url = req.body.homepage;
+
+    console.log("cookie 'user' in POST /profile:", req.session.user);
+
+    if (
+        url != "" &&
+        !url.startsWith("http://") &&
+        !url.startsWith("https://")
+    ) {
+        res.render("profile", {
+            error: true,
+        });
+    } else {
+        db.addProfile(age, city, url, req.session.user.id)
+            .then(() => {
+                res.redirect("/petition");
+                console.log(
+                    "profile info inserted in database, redirect to /petition:"
+                );
+            })
+            .catch((err) => {
+                res.redirect("/petition");
+                console.log(
+                    "error in POST /profile, redirect to /petition",
+                    err
+                );
+            });
+    }
+});
+
 //////////////////// LOGIN SITE ////////////////////
 
 app.get("/login", (req, res) => {
-    console.log("GET request to login site");
+    console.log("GET request to login site, cookie:", req.session.user);
+
     if (req.session.user) {
         res.redirect("/petition");
         console.log("has cookie, redirect from /login to /petition");
@@ -116,6 +172,10 @@ app.post("/login", (req, res) => {
     const email = req.body.email;
     const password = req.body.password;
     req.session.user = {};
+    console.log(
+        "POST request to login site, cookie after {}:",
+        req.session.user
+    );
     let id;
 
     if (email != "" && password != "") {
@@ -133,9 +193,13 @@ app.post("/login", (req, res) => {
             .then((matchValue) => {
                 console.log("match value of compare:", matchValue); // true or false
                 if (matchValue) {
+                    console.log(
+                        "POST to /login, cookie in matchValue before:",
+                        req.session.user
+                    );
                     req.session.user.id = id;
                     console.log(
-                        "cookie after password match in login:",
+                        "POST to /login, cookie in matchValue after password match in login:",
                         req.session.user
                     );
                     res.redirect("/petition");
@@ -169,17 +233,30 @@ app.post("/login", (req, res) => {
 
 //////////////////// PETITION SITE ////////////////////
 app.get("/petition", (req, res) => {
-    console.log("GET request to petition site");
+    console.log("GET request to petition site, cookie:", req.session.user);
     if (!req.session.user) {
         res.redirect("/login");
-        console.log("no cookie, redirect from /petition to /login");
+        console.log(
+            "no cookie, redirect from GET /petition to /login, cookie:",
+            req.session.user
+        );
+    } else if (req.session.user.idSig) {
+        res.redirect("/thanks");
+        console.log(
+            "GET /petition, has already signed/idSig, redirect to /thanks, cookie:",
+            req.session.user
+        );
     } else {
         res.render("petition");
     }
 });
 
-// get signature and add to database, set cookie and redirect
+// get signature and user_id and add to database "signatures", set cookie and redirect
 app.post("/petition", (req, res) => {
+    console.log(
+        "POST to /petition, cookie at beginning of route:",
+        req.session.user
+    );
     let signature = req.body.signature;
     let user_id = req.session.user.id;
     console.log("user_id:", user_id);
@@ -187,9 +264,14 @@ app.post("/petition", (req, res) => {
     if (signature != "") {
         db.addSignee(signature, user_id)
             .then((response) => {
-                req.session.user.idSig = response.rows[0].id; // set cookie
+                response.rows[0];
                 console.log(
-                    "cookie after /petition POST-request:",
+                    "POST to /petition, cookie before change:",
+                    req.session.user
+                );
+                req.session.user.idSig = response.rows[0].id; // set cookie "idSig" on id in "signatures"
+                console.log(
+                    "POST to /petition, cookie after change:",
                     req.session.user
                 );
                 res.redirect("/thanks");
@@ -217,14 +299,13 @@ app.get("/thanks", (req, res) => {
     let amountOfSignees;
     let currentSignature;
     let idSig = req.session.user.idSig;
-    console.log("idSig:", idSig);
+    console.log("req.session.user.idSig:", idSig);
     let id = req.session.user.id;
-    console.log("id:", id);
+    console.log("req.session.user.id:", id);
 
     if (req.session.user.idSig) {
         db.getCurrentFirstNameById(id)
             .then((result) => {
-                console.log("result:", result);
                 currentFirstName = result.first;
                 console.log("current first name:", currentFirstName);
             })
@@ -243,9 +324,9 @@ app.get("/thanks", (req, res) => {
 
         db.getCurrentSignatureById(idSig)
             .then((result) => {
-                console.log("result of getCurrentSignatureById:", result);
-                currentSignature = result;
-                console.log("current signature:", currentSignature);
+                // console.log("result of getCurrentSignatureById:", result);
+                currentSignature = result.signature;
+                // console.log("current signature:", currentSignature);
                 // render current first name, amount of signees and current signature:
                 res.render("thanks", {
                     cfn: currentFirstName,
@@ -270,10 +351,10 @@ app.get("/signers", (req, res) => {
     const { sigId } = req.session;
 
     if (sigId) {
-        // show first and last names of other signees
+        // show first and last names, age & cities of other signees
         console.log("GET request to /signers with cookie");
 
-        db.getFullNamesOfSignees()
+        db.getFullInfoOfSignees()
             .then((results) => {
                 // loop through table-names and push them into an array
                 let namesArr = [];

@@ -19,9 +19,28 @@ module.exports.addSignee = (signature, user_id) => {
         `
     INSERT INTO signatures (signature, user_id)
     VALUES ($1, $2)
-    RETURNING id;`,
+        RETURNING id;`,
         [signature, user_id]
     );
+};
+// RETURNING *;`,
+
+// INSERT AGE, CITY AND URL INTO DATABASE "USER_PROFILES"
+module.exports.addProfile = (age, city, url, user_id) => {
+    return db.query(
+        `
+    INSERT INTO user_profiles (age, city, url, user_id)
+    VALUES ($1, $2, $3, $4)
+    RETURNING id;`,
+        [age, city, url, user_id]
+    );
+};
+
+// HAS THE USER SIGNED?
+module.exports.hasUserSigned = (id) => {
+    return db.query(`SELECT signature FROM signatures WHERE user_id = $1`, [
+        user_id,
+    ]);
 };
 
 // RETURN HASH OF USERS FOR COMPARISON
@@ -42,7 +61,7 @@ module.exports.getNumberOfSignees = () => {
 };
 
 // RETURN FIRST AND LAST NAMES
-module.exports.getFullNamesOfSignees = () => {
+module.exports.getFullInfoOfSignees = () => {
     return db.query(`SELECT first, last FROM users`);
 };
 
@@ -52,7 +71,8 @@ module.exports.getCurrentSignatureById = (user_id) => {
         .query(`SELECT signature FROM signatures WHERE user_id = $1`, [user_id])
         .then((result) => {
             // return result.rows[0].signature;
-            return result.rows[0].signature;
+            return result.rows[0];
+            // return result.rows[0].signature;
         });
 };
 

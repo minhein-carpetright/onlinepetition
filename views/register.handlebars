@@ -8,10 +8,14 @@ Every vote supports the cause for a fair and just ...<br>
 
 <form method="POST" id="registerfields">
     <div id="fourfields">
-        <input id="first" name="first" placeholder="enter first name" type="text" autocomplete="off" />
-        <input id="last" name="last" placeholder="enter last name" type="text" autocomplete="off" />
-        <input id="email-register" name="email" placeholder="enter email address" type="text" autocomplete="off" />
-        <input id="password-register" name="password" placeholder="enter password" type="text" autocomplete="off" />
+        <div>First Name</div>
+        <input id="first" name="first" placeholder="e.g. Jane" type="text" autocomplete="off" />
+        <div>Last Name</div>
+        <input id="last" name="last" placeholder="e.g. Doe" type="text" autocomplete="off" />
+        <div>Email</div>
+        <input id="email-register" name="email" placeholder="e.g. jane@doe.org" type="text" autocomplete="off" />
+        <div>Password</div>
+        <input id="password-register" name="password" placeholder="e.g. X8kF3da#V§d" type="text" autocomplete="off" />
         <input type="hidden" name="_csrf" value="{{csrfToken}}">
     </div>
     <button id="register-button">register</button>

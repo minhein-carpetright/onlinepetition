@@ -14,8 +14,10 @@ Every vote supports the cause for a fair and just ...<br>
 
 <form method="POST" id="loginfields">
     <div id="twofields">
-        <input id="email-login" name="email" placeholder="enter email address" type="text" autocomplete="off" />
-        <input id="password-login" name="password" placeholder="enter password" type="text" autocomplete="off" />
+        <div>Email</div>
+        <input id="email-login" name="email" placeholder="e.g. jane@doe.org" type="text" autocomplete="off" />
+        <div>Password</div>
+        <input id="password-login" name="password" placeholder="e.g. X8kF3da#V§d" type="text" autocomplete="off" />
         <input type="hidden" name="_csrf" value="{{csrfToken}}">
     </div>
     <button id="login-button">login</button>
