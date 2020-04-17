@@ -48,16 +48,16 @@ app.use(function (err, req, res, next) {
 // redirect to petition if on main site
 app.get("/", (req, res) => {
     res.redirect("/register");
-    console.log("GET request to root route -> redirected to /register");
+    console.log("GET request to root route -> redirect to /register");
 });
 
 //////////////////// REGISTER SITE ////////////////////
 app.get("/register", (req, res) => {
-    console.log("GET request to register site");
+    console.log("GET request to /register");
     if (req.session.user) {
         res.redirect("/petition");
         console.log(
-            "has cookie, redirect from /login to /petition, cookie:",
+            "has cookie, redirect from /register to /petition, cookie:",
             req.session.user
         );
     } else {
@@ -82,8 +82,8 @@ app.post("/register", (req, res) => {
             .then((response) => {
                 req.session.user = {
                     // set cookie "user"
-                    firstName: first,
-                    lastName: last,
+                    // firstName: first,
+                    // lastName: last,
                     id: response.rows[0].id,
                 };
                 console.log(
@@ -92,7 +92,7 @@ app.post("/register", (req, res) => {
                 );
                 res.redirect("/profile");
                 console.log(
-                    "registration successful, 4 input fields added to database, cookie user set, redirect to /profile"
+                    "registration successful, 4 input fields added to database, cookie 'user' set, redirect to /profile"
                 );
             })
             .catch((err) => {
@@ -109,7 +109,8 @@ app.post("/register", (req, res) => {
 
 //////////////////// PROFILE SITE ////////////////////
 app.get("/profile", (req, res) => {
-    console.log("GET request to profile site");
+    console.log("GET request to /profile, cookie:", req.session.user);
+
     if (!req.session.user) {
         res.redirect("/register");
         console.log(
@@ -123,11 +124,16 @@ app.get("/profile", (req, res) => {
 });
 
 app.post("/profile", (req, res) => {
+    console.log(
+        "POST to /profile, cookie at beginning of route:",
+        req.session.user
+    );
     const age = req.body.age;
     const city = req.body.city;
     const url = req.body.homepage;
-
-    console.log("cookie 'user' in POST /profile:", req.session.user);
+    let user_id = req.session.user.id;
+    // console.log("user_id:", user_id);
+    // console.log("req.session.user.id:", req.session.user.id);
 
     if (
         url != "" &&
@@ -138,8 +144,23 @@ app.post("/profile", (req, res) => {
             error: true,
         });
     } else {
-        db.addProfile(age, city, url, req.session.user.id)
-            .then(() => {
+        db.addProfile(age, city, url, user_id)
+            .then((response) => {
+                console.log(
+                    "POST to /profile, cookie before change:",
+                    req.session.user
+                );
+                console.log(
+                    "look at what database reveals before setting cookie idProf:",
+                    response.rows[0]
+                );
+                req.session.user.idProf = response.rows[0].id; // set cookie "idProf" on id in "user_profiles"
+                // req.session.user.idProf = user_id; // set cookie "idProf" on user_id in "user_profiles"
+                console.log("database after cookie is set:", response.rows[0]);
+                console.log(
+                    "POST to /profile, cookie after change with idProf:",
+                    req.session.user
+                );
                 res.redirect("/petition");
                 console.log(
                     "profile info inserted in database, redirect to /petition:"
@@ -233,11 +254,12 @@ app.post("/login", (req, res) => {
 
 //////////////////// PETITION SITE ////////////////////
 app.get("/petition", (req, res) => {
-    console.log("GET request to petition site, cookie:", req.session.user);
+    console.log("GET request to /petition, cookie:", req.session.user);
+
     if (!req.session.user) {
-        res.redirect("/login");
+        res.redirect("/register");
         console.log(
-            "no cookie, redirect from GET /petition to /login, cookie:",
+            "no cookie, redirect from GET /petition to /register, cookie:",
             req.session.user
         );
     } else if (req.session.user.idSig) {
@@ -264,14 +286,15 @@ app.post("/petition", (req, res) => {
     if (signature != "") {
         db.addSignee(signature, user_id)
             .then((response) => {
-                response.rows[0];
+                // console.log("response.rows[0]:", response.rows[0]); // do I need this line?
+                // console.log("user_id:", user_id); // do I need this line?
                 console.log(
                     "POST to /petition, cookie before change:",
                     req.session.user
                 );
                 req.session.user.idSig = response.rows[0].id; // set cookie "idSig" on id in "signatures"
                 console.log(
-                    "POST to /petition, cookie after change:",
+                    "POST to /petition, cookie after change with idSig:",
                     req.session.user
                 );
                 res.redirect("/thanks");
@@ -293,20 +316,33 @@ app.post("/petition", (req, res) => {
 
 //////////////////// THANKS SITE ////////////////////
 // thank signee and show number of signees and signature
+
 app.get("/thanks", (req, res) => {
-    console.log("GET request to /thanks");
     console.log(
-        "GET to /thanks, cookie at beginning of route:",
+        "GET  request to /thanks, cookie at beginning of route:",
         req.session.user
     );
     let currentFirstName;
     let amountOfSignees;
     let currentSignature;
-    let id = req.session.user.id;
-    let idSig = req.session.user.idSig;
+    let user = req.session.user;
 
-    if (idSig) {
-        // if (req.session.user.idSig) {
+    if (!req.session.user) {
+        res.redirect("/register");
+        console.log(
+            "no cookie, redirect from GET /thanks to /register, cookie:",
+            req.session.user
+        );
+        let idSig = req.session.user.idSig;
+    } else if (!req.session.user.idSig) {
+        res.redirect("/petition");
+        console.log(
+            "GET /thanks, has not signed, redirect to /petition, cookie:",
+            req.session.user
+        );
+    } else {
+        let id = req.session.user.id;
+
         db.getCurrentFirstNameById(id)
             .then((result) => {
                 currentFirstName = result.first;
@@ -325,16 +361,17 @@ app.get("/thanks", (req, res) => {
                 console.log("error in getNumberOfSignees amount:", err);
             });
 
+        let idSig = req.session.user.idSig;
         db.getCurrentSignatureById(idSig)
             .then((result) => {
                 // console.log("result of getCurrentSignatureById:", result);
-                currentSignature = result.signature;
+                // currentSignature = result.signature;
                 // console.log("current signature:", currentSignature);
                 // render current first name, amount of signees and current signature:
                 res.render("thanks", {
                     cfn: currentFirstName,
                     amount: amountOfSignees,
-                    currentSig: currentSignature,
+                    currentSig: result,
                 });
             })
             .catch((err) => {
@@ -344,13 +381,6 @@ app.get("/thanks", (req, res) => {
             "GET to /thanks, cookie at end of route:",
             req.session.user
         );
-    } else {
-        // if no cookie redirect to /petition
-        console.log(
-            "GET request to /thanks without signature cookie -> redirect to /petition, cookie:",
-            req.session.user
-        );
-        res.redirect("/petition");
     }
 });
 
@@ -360,11 +390,23 @@ app.get("/signers", (req, res) => {
         "GET request to /signers, cookie at beginning of route:",
         req.session.user
     );
-    let idSig = req.session.user.idSig;
 
-    if (idSig) {
+    if (!req.session.user) {
+        res.redirect("/register");
+        console.log(
+            "no cookie, redirect from GET /signers to /register, cookie:",
+            req.session.user
+        );
+        let idSig = req.session.user.idSig;
+    } else if (!req.session.user.idSig) {
+        res.redirect("/petition");
+        console.log(
+            "GET /signers, has not signed, redirect to /petition, cookie:",
+            req.session.user
+        );
+    } else {
         // show first and last names, age & cities of other signees
-        console.log("GET request to /signers with cookie");
+        console.log("GET request to /signers with cookie", req.session.user);
 
         db.getFullInfoOfSignees()
             .then((results) => {
@@ -388,19 +430,8 @@ app.get("/signers", (req, res) => {
             "GET request to /signers, cookie after catch:",
             req.session.user
         );
-    } else {
-        // if no cookie redirect to /petition
-        console.log(
-            "GET request to /signers, (no) cookie:",
-            req.session.user,
-            "-->redirect to /petition"
-        );
-        res.redirect("/petition");
     }
 });
-
-// log out user:
-// req.session = null;
 
 app.use(function (req, res, next) {
     res.status(404).send("sorry can't find that, 404");

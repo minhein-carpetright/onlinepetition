@@ -58,7 +58,7 @@ module.exports.getHashByEmail = (email) => {
 
 // RETURN NUMBER OF SIGNEES
 module.exports.getNumberOfSignees = () => {
-    return db.query(`SELECT COUNT(id) FROM users`).then((result) => {
+    return db.query(`SELECT COUNT(id) FROM signatures`).then((result) => {
         return result.rows[0].count;
     });
 };
@@ -69,13 +69,11 @@ module.exports.getFullInfoOfSignees = () => {
 };
 
 // RETURN SIGNATURE OF CURRENT/LAST ID
-module.exports.getCurrentSignatureById = (user_id) => {
+module.exports.getCurrentSignatureById = (id) => {
     return db
-        .query(`SELECT signature FROM signatures WHERE user_id = $1`, [user_id])
+        .query(`SELECT signature FROM signatures WHERE id = $1`, [id])
         .then((result) => {
-            // return result.rows[0].signature;
-            return result.rows[0];
-            // return result.rows[0].signature;
+            return result.rows[0].signature;
         });
 };
 
