@@ -1,5 +1,8 @@
 const spicedPg = require("spiced-pg");
-const db = spicedPg("postgres:postgres:postgres@localhost:5432/petition");
+const db = spicedPg(
+    process.env.DATABASE_URL ||
+        "postgres:postgres:postgres@localhost:5432/petition"
+);
 // db is an object, has one method: query()
 
 // INSERT FIRST AND LAST NAME, EMAIL AND PASSWORD INTO DATABASE "USERS"

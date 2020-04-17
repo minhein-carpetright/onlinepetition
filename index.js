@@ -294,16 +294,19 @@ app.post("/petition", (req, res) => {
 //////////////////// THANKS SITE ////////////////////
 // thank signee and show number of signees and signature
 app.get("/thanks", (req, res) => {
-    console.log("GET request to /thanks with cookies");
+    console.log("GET request to /thanks");
+    console.log(
+        "GET to /thanks, cookie at beginning of route:",
+        req.session.user
+    );
     let currentFirstName;
     let amountOfSignees;
     let currentSignature;
-    let idSig = req.session.user.idSig;
-    console.log("req.session.user.idSig:", idSig);
     let id = req.session.user.id;
-    console.log("req.session.user.id:", id);
+    let idSig = req.session.user.idSig;
 
-    if (req.session.user.idSig) {
+    if (idSig) {
+        // if (req.session.user.idSig) {
         db.getCurrentFirstNameById(id)
             .then((result) => {
                 currentFirstName = result.first;
@@ -337,10 +340,15 @@ app.get("/thanks", (req, res) => {
             .catch((err) => {
                 console.log("error in getCurrentSignatureById:", err);
             });
+        console.log(
+            "GET to /thanks, cookie at end of route:",
+            req.session.user
+        );
     } else {
         // if no cookie redirect to /petition
         console.log(
-            "GET request to /thanks without signature cookie -> redirect to /petition"
+            "GET request to /thanks without signature cookie -> redirect to /petition, cookie:",
+            req.session.user
         );
         res.redirect("/petition");
     }
@@ -348,9 +356,13 @@ app.get("/thanks", (req, res) => {
 
 //////////////////// SIGNERS SITE ////////////////////
 app.get("/signers", (req, res) => {
-    const { sigId } = req.session;
+    console.log(
+        "GET request to /signers, cookie at beginning of route:",
+        req.session.user
+    );
+    let idSig = req.session.user.idSig;
 
-    if (sigId) {
+    if (idSig) {
         // show first and last names, age & cities of other signees
         console.log("GET request to /signers with cookie");
 
@@ -370,12 +382,18 @@ app.get("/signers", (req, res) => {
                 });
             })
             .catch((err) => {
-                console.log("error in getFullNamesOfSignees:", err);
+                console.log("error in getFullInfoOfSignees:", err);
             });
+        console.log(
+            "GET request to /signers, cookie after catch:",
+            req.session.user
+        );
     } else {
         // if no cookie redirect to /petition
         console.log(
-            "GET request to /signers without cookie -> redirect to /petition"
+            "GET request to /signers, (no) cookie:",
+            req.session.user,
+            "-->redirect to /petition"
         );
         res.redirect("/petition");
     }
@@ -388,4 +406,6 @@ app.use(function (req, res, next) {
     res.status(404).send("sorry can't find that, 404");
 });
 
-app.listen(8080, () => console.log("petition server is listening"));
+app.listen(process.env.PORT || 8080, () =>
+    console.log("petition server is listening")
+);
