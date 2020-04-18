@@ -128,7 +128,9 @@ app.post("/profile", (req, res) => {
         "POST to /profile, cookie at beginning of route:",
         req.session.user
     );
-    const age = req.body.age;
+    const age = parseInt(req.body.age);
+    console.log("age:", age);
+    // const age = req.body.age;
     const city = req.body.city;
     const url = req.body.homepage;
     let user_id = req.session.user.id;
@@ -397,7 +399,7 @@ app.get("/signers", (req, res) => {
             "no cookie, redirect from GET /signers to /register, cookie:",
             req.session.user
         );
-        let idSig = req.session.user.idSig;
+        let idSig = req.session.user.idSig; // necessary?
     } else if (!req.session.user.idSig) {
         res.redirect("/petition");
         console.log(
@@ -410,17 +412,26 @@ app.get("/signers", (req, res) => {
 
         db.getFullInfoOfSignees()
             .then((results) => {
+                console.log("results of getFullInfoOfSignees", results);
                 // loop through table-names and push them into an array
-                let namesArr = [];
-                for (let i = 0; i < results.rows.length; i++) {
-                    let completeName =
-                        results.rows[i].first + " " + results.rows[i].last;
-                    namesArr.push(completeName);
+                let fullInfoArr = [];
+                for (let i = 0; i < results.length; i++) {
+                    let completeInfo =
+                        results[i].first +
+                        " " +
+                        results[i].last +
+                        " " +
+                        results[i].city +
+                        " " +
+                        results[i].age +
+                        " " +
+                        results[i].url;
+                    fullInfoArr.push(completeInfo);
                 }
-                // console.log("results.rows:", results.rows);
-                // console.log("namesArr:", namesArr);
+                console.log("results:", results);
+                console.log("fullInfoArr:", fullInfoArr);
                 res.render("signers", {
-                    fullNames: namesArr,
+                    fullNames: fullInfoArr,
                 });
             })
             .catch((err) => {

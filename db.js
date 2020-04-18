@@ -20,8 +20,8 @@ module.exports.addUser = (first, last, email, password) => {
 module.exports.addSignee = (signature, user_id) => {
     return db.query(
         `
-    INSERT INTO signatures (signature, user_id)
-    VALUES ($1, $2)
+        INSERT INTO signatures (signature, user_id)
+        VALUES ($1, $2)
         RETURNING id;`,
         [signature, user_id]
     );
@@ -32,9 +32,9 @@ module.exports.addSignee = (signature, user_id) => {
 module.exports.addProfile = (age, city, url, user_id) => {
     return db.query(
         `
-    INSERT INTO user_profiles (age, city, url, user_id)
-    VALUES ($1, $2, $3, $4)
-    RETURNING id;`,
+        INSERT INTO user_profiles (age, city, url, user_id)
+        VALUES ($1, $2, $3, $4)
+        RETURNING id;`,
         [age, city, url, user_id]
     );
 };
@@ -56,16 +56,21 @@ module.exports.getHashByEmail = (email) => {
         });
 };
 
+// RETURN FIRST NAME OF CURRENT/LAST ID
+module.exports.getCurrentFirstNameById = (id) => {
+    return db
+        .query(`SELECT first FROM users WHERE id = $1`, [id])
+        .then((result) => {
+            // return result.rows[0].first;
+            return result.rows[0];
+        });
+};
+
 // RETURN NUMBER OF SIGNEES
 module.exports.getNumberOfSignees = () => {
     return db.query(`SELECT COUNT(id) FROM signatures`).then((result) => {
         return result.rows[0].count;
     });
-};
-
-// RETURN FIRST AND LAST NAMES
-module.exports.getFullInfoOfSignees = () => {
-    return db.query(`SELECT first, last FROM users`);
 };
 
 // RETURN SIGNATURE OF CURRENT/LAST ID
@@ -77,13 +82,20 @@ module.exports.getCurrentSignatureById = (id) => {
         });
 };
 
-// RETURN FIRST NAME OF CURRENT/LAST ID
-module.exports.getCurrentFirstNameById = (id) => {
+// RETURN FIRST AND LAST NAMES, AGE, CITY, URL
+module.exports.getFullInfoOfSignees = () => {
     return db
-        .query(`SELECT first FROM users WHERE id = $1`, [id])
+        .query(
+            `
+        SELECT users.first, users.last, user_profiles.age, user_profiles.city, user_profiles.url
+        FROM signatures
+        JOIN users
+        ON users.id = signatures.user_id
+        LEFT OUTER JOIN user_profiles
+        ON users.id = user_profiles.user_id;`
+        )
         .then((result) => {
-            // return result.rows[0].first;
-            return result.rows[0];
+            return result.rows;
         });
 };
 
