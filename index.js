@@ -128,19 +128,8 @@ app.post("/profile", (req, res) => {
         "POST to /profile, cookie at beginning of route:",
         req.session.user
     );
-
-    // let age = parseInt(req.body.age);
     let age = req.body.age;
-    console.log("age:", age);
     // if age is not filled out the databank doesn't store the other values - to prevent this:
-    // checkAge = (age) => {
-    //     if (age === NaN) {
-    //         return null;
-    //     } else {
-    //         return age;
-    //     }
-    // };
-
     checkAge = (age) => {
         if (age == "") {
             return null;
@@ -148,7 +137,6 @@ app.post("/profile", (req, res) => {
             return age;
         }
     };
-    console.log("age:", age);
 
     const city = req.body.city;
     const url = req.body.homepage;
@@ -367,7 +355,7 @@ app.get("/thanks", (req, res) => {
         db.getCurrentFirstNameById(id)
             .then((result) => {
                 currentFirstName = result.first;
-                console.log("current first name:", currentFirstName);
+                // console.log("current first name:", currentFirstName);
             })
             .catch((err) => {
                 console.log("error in getCurrentFirstNameById:", err);
@@ -376,7 +364,7 @@ app.get("/thanks", (req, res) => {
         db.getNumberOfSignees()
             .then((result) => {
                 amountOfSignees = result;
-                console.log("number of signees:", amountOfSignees);
+                // console.log("number of signees:", amountOfSignees);
             })
             .catch((err) => {
                 console.log("error in getNumberOfSignees amount:", err);
@@ -426,31 +414,14 @@ app.get("/signers", (req, res) => {
             req.session.user
         );
     } else {
-        // show first and last names, age & cities of other signees
+        // show first and last names, age, cities and homepage of other signees
         console.log("GET request to /signers with cookie", req.session.user);
 
         db.getFullInfoOfSignees()
             .then((results) => {
-                console.log("results of getFullInfoOfSignees", results);
-                // loop through table-names and push them into an array
-                let fullInfoArr = [];
-                for (let i = 0; i < results.length; i++) {
-                    let completeInfo =
-                        results[i].first +
-                        " " +
-                        results[i].last +
-                        " " +
-                        results[i].city +
-                        " " +
-                        results[i].age +
-                        " " +
-                        results[i].url;
-                    fullInfoArr.push(completeInfo);
-                }
-                console.log("results:", results);
-                console.log("fullInfoArr:", fullInfoArr);
+                // console.log("results of getFullInfoOfSignees", results);
                 res.render("signers", {
-                    fullNames: fullInfoArr,
+                    fullInfo: results,
                 });
             })
             .catch((err) => {
@@ -458,6 +429,48 @@ app.get("/signers", (req, res) => {
             });
         console.log(
             "GET request to /signers, cookie after catch:",
+            req.session.user
+        );
+    }
+});
+
+app.get("/signers/:city", (req, res) => {
+    console.log(
+        "GET request to /city, cookie at beginning of route:",
+        req.session.user
+    );
+
+    if (!req.session.user) {
+        res.redirect("/register");
+        console.log(
+            "no cookie, redirect from GET /city to /register, cookie:",
+            req.session.user
+        );
+        let idSig = req.session.user.idSig; // necessary?
+    } else if (!req.session.user.idSig) {
+        res.redirect("/petition");
+        console.log(
+            "GET /city, has not signed, redirect to /petition, cookie:",
+            req.session.user
+        );
+    } else {
+        // show first and last names, age and homepage of other signees in the same city
+        console.log("GET request to /city with cookie", req.session.user);
+        const city = req.params.city;
+        console.log("city:", city);
+        db.getCityOfSignee(city)
+            .then((results) => {
+                console.log("results of getCityOfSignee:", results);
+                // console.log("results of getCityOfSignee.city:", results.city);
+                res.render("city", {
+                    fullInfoCities: results,
+                });
+            })
+            .catch((err) => {
+                console.log("error in getCityOfSignee:", err);
+            });
+        console.log(
+            "GET request to /city, cookie after catch:",
             req.session.user
         );
     }

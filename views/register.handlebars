@@ -15,7 +15,11 @@ Every vote supports the cause for a fair and just ...<br>
         <div>Email</div>
         <input id="email-register" name="email" placeholder="e.g. jane@doe.org" type="text" autocomplete="off" />
         <div>Password</div>
-        <input id="password-register" name="password" placeholder="e.g. X8kF3da#V§d" type="text" autocomplete="off" />
+        <div>
+            <label for="pass">Password (8 characters minimum):</label>
+            <input type="password" id="password-register" name="password"
+           minlength="8" required placeholder="e.g. X8kF3da#V§d" autocomplete="off">
+        </div>
         <input type="hidden" name="_csrf" value="{{csrfToken}}">
     </div>
     <button id="register-button">register</button>

@@ -1,8 +1,7 @@
 <h2>We demand that ...</h2>
 
 <div id="listofnames">
-    {{#fullNames}}
-        <p id="signees">{{.}}</p>
-{{!-- {{.}} is the current element when looping through an array --}}
-    {{/fullNames}}
+    {{#fullInfo}}
+        {{#if this.url}}<a href='{{this.url}}'>{{/if}}{{this.first}} {{this.last}}{{#if this.url}}</a>{{/if}}{{#if this.age}}   |   {{this.age}}{{/if}}{{#if this.city}}   |   <a href='/signers/{{this.city}}'>{{this.city}}</a>{{/if}}<br>
+    {{/fullInfo}}
 </div>

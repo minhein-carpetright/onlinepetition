@@ -29,4 +29,4 @@ CREATE TABLE user_profiles (
 
 -- here we are adding the foreign key (user_id)
 -- foreign key lets us identify which user from the users table signed the petition
--- and which signature is theirs (acts as an identifier between the 2 tables!)
+-- and which signature is theirs (acts as an identifier between the 2 tables)

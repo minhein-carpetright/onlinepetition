@@ -40,6 +40,15 @@ module.exports.getHashByEmail = (email) => {
         });
 };
 
+// HAS THE USER SIGNED?
+module.exports.hasUserSigned = (id) => {
+    return db
+        .query(`SELECT id FROM signatures WHERE user_id = $1`, [id])
+        .then((result) => {
+            return result.rows[0];
+        });
+};
+
 ////////////////////////// PETITION //////////////////////////
 // INSERT SIGNATURE INTO DATABASE "SIGNATURES"
 module.exports.addSignee = (signature, user_id) => {
@@ -96,11 +105,24 @@ module.exports.getFullInfoOfSignees = () => {
         });
 };
 
-// HAS THE USER SIGNED?
-module.exports.hasUserSigned = (id) => {
-    return db.query(`SELECT signature FROM signatures WHERE user_id = $1`, [
-        user_id,
-    ]);
+////////////////////////// CITY //////////////////////////
+// RETURN FIRST AND LAST NAMES, AGE, CITY, URL
+module.exports.getCityOfSignee = (city) => {
+    return db
+        .query(
+            `
+        SELECT users.first, users.last, user_profiles.age, user_profiles.city, user_profiles.url
+        FROM signatures
+        JOIN users
+        ON users.id = signatures.user_id
+        LEFT OUTER JOIN user_profiles
+        ON users.id = user_profiles.user_id
+        WHERE LOWER(user_profiles.city) = LOWER($1)`,
+            [city]
+        )
+        .then((result) => {
+            return result.rows[0];
+        });
 };
 
 // EXPORT BY FIRST NAME (if firstName is inserted I get every row with that name)
