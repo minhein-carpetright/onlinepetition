@@ -128,9 +128,19 @@ app.post("/profile", (req, res) => {
         "POST to /profile, cookie at beginning of route:",
         req.session.user
     );
+
     const age = parseInt(req.body.age);
     console.log("age:", age);
-    // const age = req.body.age;
+    // if age is not filled out the databank doesn't store the other values - to prevent this:
+    const checkAge = (age) => {
+        if (age == NaN) {
+            return null;
+        } else {
+            return age;
+        }
+    };
+    console.log("age:", age);
+
     const city = req.body.city;
     const url = req.body.homepage;
     let user_id = req.session.user.id;
@@ -146,7 +156,7 @@ app.post("/profile", (req, res) => {
             error: true,
         });
     } else {
-        db.addProfile(age, city, url, user_id)
+        db.addProfile(checkedAge, city, url, user_id)
             .then((response) => {
                 console.log(
                     "POST to /profile, cookie before change:",
