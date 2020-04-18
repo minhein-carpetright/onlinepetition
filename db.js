@@ -5,6 +5,7 @@ const db = spicedPg(
 );
 // db is an object, has one method: query()
 
+////////////////////////// REGISTER //////////////////////////
 // INSERT FIRST AND LAST NAME, EMAIL AND PASSWORD INTO DATABASE "USERS"
 module.exports.addUser = (first, last, email, password) => {
     return db.query(
@@ -16,6 +17,30 @@ module.exports.addUser = (first, last, email, password) => {
     );
 };
 
+////////////////////////// PROFILE //////////////////////////
+// INSERT AGE, CITY AND URL INTO DATABASE "USER_PROFILES"
+module.exports.addProfile = (age, city, url, user_id) => {
+    return db.query(
+        `
+        INSERT INTO user_profiles (age, city, url, user_id)
+        VALUES ($1, $2, $3, $4)
+        RETURNING id;`,
+        [checkAge(age), city, url, user_id]
+    );
+};
+
+////////////////////////// LOGIN //////////////////////////
+// RETURN HASH OF USERS FOR COMPARISON
+module.exports.getHashByEmail = (email) => {
+    // return db.query(`SELECT * FROM users WHERE email = $1`, [email]);
+    return db
+        .query(`SELECT password, id FROM users WHERE email = $1`, [email])
+        .then((result) => {
+            return result.rows[0];
+        });
+};
+
+////////////////////////// PETITION //////////////////////////
 // INSERT SIGNATURE INTO DATABASE "SIGNATURES"
 module.exports.addSignee = (signature, user_id) => {
     return db.query(
@@ -25,35 +50,6 @@ module.exports.addSignee = (signature, user_id) => {
         RETURNING id;`,
         [signature, user_id]
     );
-};
-// RETURNING *;`,
-
-// INSERT AGE, CITY AND URL INTO DATABASE "USER_PROFILES"
-module.exports.addProfile = (age, city, url, user_id) => {
-    return db.query(
-        `
-        INSERT INTO user_profiles (age, city, url, user_id)
-        VALUES ($1, $2, $3, $4)
-        RETURNING id;`,
-        [age, city, url, user_id]
-    );
-};
-
-// HAS THE USER SIGNED?
-module.exports.hasUserSigned = (id) => {
-    return db.query(`SELECT signature FROM signatures WHERE user_id = $1`, [
-        user_id,
-    ]);
-};
-
-// RETURN HASH OF USERS FOR COMPARISON
-module.exports.getHashByEmail = (email) => {
-    // return db.query(`SELECT * FROM users WHERE email = $1`, [email]);
-    return db
-        .query(`SELECT password, id FROM users WHERE email = $1`, [email])
-        .then((result) => {
-            return result.rows[0];
-        });
 };
 
 // RETURN FIRST NAME OF CURRENT/LAST ID
@@ -82,6 +78,7 @@ module.exports.getCurrentSignatureById = (id) => {
         });
 };
 
+////////////////////////// SIGNEES //////////////////////////
 // RETURN FIRST AND LAST NAMES, AGE, CITY, URL
 module.exports.getFullInfoOfSignees = () => {
     return db
@@ -97,6 +94,13 @@ module.exports.getFullInfoOfSignees = () => {
         .then((result) => {
             return result.rows;
         });
+};
+
+// HAS THE USER SIGNED?
+module.exports.hasUserSigned = (id) => {
+    return db.query(`SELECT signature FROM signatures WHERE user_id = $1`, [
+        user_id,
+    ]);
 };
 
 // EXPORT BY FIRST NAME (if firstName is inserted I get every row with that name)
