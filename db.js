@@ -32,9 +32,13 @@ module.exports.addProfile = (age, city, url, user_id) => {
 ////////////////////////// LOGIN //////////////////////////
 // RETURN HASH OF USERS FOR COMPARISON
 module.exports.getHashByEmail = (email) => {
-    // return db.query(`SELECT * FROM users WHERE email = $1`, [email]);
     return db
-        .query(`SELECT password, id FROM users WHERE email = $1`, [email])
+        .query(
+            `SELECT password, id
+        FROM users
+        WHERE email = $1`,
+            [email]
+        )
         .then((result) => {
             return result.rows[0];
         });
@@ -43,11 +47,31 @@ module.exports.getHashByEmail = (email) => {
 // HAS THE USER SIGNED?
 module.exports.hasUserSigned = (id) => {
     return db
-        .query(`SELECT id FROM signatures WHERE user_id = $1`, [id])
+        .query(
+            `
+        SELECT id FROM signatures WHERE user_id = $1;`,
+            [id]
+        )
         .then((result) => {
             return result.rows[0];
         });
 };
+
+// module.exports.hasUserSigned = (email) => {
+//     return db
+//         .query(
+//             `SELECT user.email, signatures.user_id
+//             FROM users
+//             JOIN signatures
+//             ON users.id = signatures.user_id
+//             WHERE email = $1`,
+//             [email]
+//         )
+//         .then((result) => {
+//             return result.rows[0];
+//         });
+// };
+// Change the query that retrieves information from the users table by email address so that it also gets data from the signatures table. Thus you will be able to know whether the user has signed the petition or not as soon as they log in.
 
 ////////////////////////// PETITION //////////////////////////
 // INSERT SIGNATURE INTO DATABASE "SIGNATURES"
@@ -121,7 +145,7 @@ module.exports.getCityOfSignee = (city) => {
             [city]
         )
         .then((result) => {
-            return result.rows[0];
+            return result.rows;
         });
 };
 

@@ -137,6 +137,7 @@ app.post("/profile", (req, res) => {
             return age;
         }
     };
+    // easier solution to the function above: pass as parameter `age || null`
 
     const city = req.body.city;
     const url = req.body.homepage;
@@ -232,10 +233,8 @@ app.post("/login", (req, res) => {
                         "POST to /login, cookie in matchValue after password match in login:",
                         req.session.user
                     );
-                    res.redirect("/petition");
-                    console.log(
-                        "hash and entered password match -> redirect to /petition"
-                    );
+                    // res.redirect("/petition"); // WIEDER HERSTELLEN 23:00
+                    console.log("hash and entered password match");
                 } else {
                     // if matchValue is false -> rerender login with error message
                     res.render("login", {
@@ -245,6 +244,42 @@ app.post("/login", (req, res) => {
                         "error in login, hash and password do not match"
                     );
                 }
+            })
+            // check for signature:
+            .then(() => {
+                db.hasUserSigned(id)
+                    .then((response) => {
+                        // ändern 23:00
+                        console.log("response hasUserSigned:", response);
+                        if (response.id) {
+                            console.log(
+                                "req.session.user before:",
+                                req.session.user
+                            );
+                            req.session.user.idSig = response.id; // set cookie idSig
+                            console.log(
+                                "req.session.user after:",
+                                req.session.user
+                            );
+                            res.redirect("/thanks");
+                            console.log(
+                                "POST /login, cookie idSig set, redirect to /thanks, cookie:",
+                                req.session.user
+                            );
+                        } else {
+                            res.redirect("/petition");
+                            console.log(
+                                "POST /login, cookie idSig not there, redirect to /petition, cookie:",
+                                req.session.user
+                            );
+                        }
+                    })
+                    .catch((err) => {
+                        console.log(
+                            "POST /login, catch in hasUserSigned:",
+                            err
+                        );
+                    });
             })
             // if matchValue is false -> rerender
             .catch((err) => {
@@ -458,12 +493,31 @@ app.get("/signers/:city", (req, res) => {
         console.log("GET request to /city with cookie", req.session.user);
         const city = req.params.city;
         console.log("city:", city);
+
+        let currentFirstName;
+        let id = req.session.user.id;
+        db.getCurrentFirstNameById(id)
+            .then((result) => {
+                currentFirstName = result.first;
+                // console.log("current first name:", currentFirstName);
+            })
+            .catch((err) => {
+                console.log("error in getCurrentFirstNameById:", err);
+            });
+
         db.getCityOfSignee(city)
             .then((results) => {
-                console.log("results of getCityOfSignee:", results);
-                // console.log("results of getCityOfSignee.city:", results.city);
+                // console.log("results of getCityOfSignee:", results);
                 res.render("city", {
+                    layout: "main", // delete later
+                    cfn: currentFirstName,
+                    city: city,
                     fullInfoCities: results,
+                    helpers: {
+                        toUpperCase(text) {
+                            return text.toUpperCase();
+                        },
+                    },
                 });
             })
             .catch((err) => {

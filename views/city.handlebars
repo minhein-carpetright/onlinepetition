@@ -1,12 +1,13 @@
 <p>Hey {{cfn}},</p>
-<p>those are the people in {{this.city}} who support our petition against algorithmic bias.</p>>
-<p>Do you know anyone from there who still hasn't signed? Make sure to let them know about our cause and forward this petition.</p>
+<p>those are the people in <b>{{toUpperCase city}}</b> who support our petition against algorithmic bias.</p>
+<p>Do you know anyone from there who still hasn't signed?</p>
+<p>Make sure to let them know about our cause and forward this petition.</p>
 
 <div id="listofnamesincity">
     {{#fullInfoCities}}
-        {{#if this.url}}<a href='{{this.url}}'>{{/if}}{{this.first}} {{this.last}}{{#if this.url}}</a>{{/if}}{{#if this.age}}{{/if}}
+        {{#if this.url}}<a href='{{this.url}}'>{{/if}}
+            {{this.first}} {{this.last}}
+        {{#if this.url}}</a>{{/if}}
+        {{#if this.age}}   |   {{this.age}}{{/if}}<br>
     {{/fullInfoCities}}
 </div>
-
-
-
