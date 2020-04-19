@@ -48,12 +48,12 @@ app.use(function (err, req, res, next) {
 // redirect to petition if on main site
 app.get("/", (req, res) => {
     res.redirect("/register");
-    console.log("GET request to root route -> redirect to /register");
+    console.log("GET / root route -> redirect to /register");
 });
 
 //////////////////// REGISTER SITE ////////////////////
 app.get("/register", (req, res) => {
-    console.log("GET request to /register");
+    console.log("GET /register");
     if (req.session.user) {
         res.redirect("/petition");
         console.log(
@@ -81,9 +81,6 @@ app.post("/register", (req, res) => {
             })
             .then((response) => {
                 req.session.user = {
-                    // set cookie "user"
-                    // firstName: first,
-                    // lastName: last,
                     id: response.rows[0].id,
                 };
                 console.log(
@@ -96,7 +93,7 @@ app.post("/register", (req, res) => {
                 );
             })
             .catch((err) => {
-                console.log("error in POST register:", err);
+                console.log("POST /register, catch:", err);
                 res.render("register", { error: true });
             });
     } else {
@@ -109,7 +106,7 @@ app.post("/register", (req, res) => {
 
 //////////////////// PROFILE SITE ////////////////////
 app.get("/profile", (req, res) => {
-    console.log("GET request to /profile, cookie:", req.session.user);
+    console.log("GET /profile, cookie:", req.session.user);
 
     if (!req.session.user) {
         res.redirect("/register");
@@ -133,7 +130,6 @@ app.post("/profile", (req, res) => {
     const city = req.body.city;
     const url = req.body.homepage;
     let user_id = req.session.user.id;
-    // console.log("user_id:", user_id);
 
     // if (
     //     url != "" &&
@@ -167,15 +163,14 @@ app.post("/profile", (req, res) => {
         })
         .catch((err) => {
             res.redirect("/petition");
-            console.log("error in POST /profile, redirect to /petition", err);
+            console.log("POST /profile, redirect to /petition, catch:", err);
         });
     // }
 });
 
 //////////////////// EDIT SITE ////////////////////
 app.get("/profile/edit", (req, res) => {
-    console.log("GET request to /edit, cookie:", req.session.user);
-    let id = req.session.user.id;
+    console.log("GET /edit, cookie:", req.session.user);
 
     if (!req.session.user) {
         res.redirect("/register");
@@ -184,24 +179,127 @@ app.get("/profile/edit", (req, res) => {
             req.session.user
         );
     } else {
+        let id = req.session.user.id;
         db.getInfoForUpdate(id)
             .then((result) => {
-                console.log("result in getInfoForUpdate:", result);
-                console.log("result.first:", result.first);
-                res.render("edit"),
-                    {
-                        result,
+                // console.log("result in getInfoForUpdate:", result);
+                res.render("edit", {
+                    first: result.first,
+                    last: result.last,
+                    email: result.email,
+                    age: result.age,
+                    city: result.city,
+                    url: result.url,
+                });
+            })
+            .catch((err) => {
+                console.log("GET /edit, catch:", err);
+            });
+        console.log(
+            "GET /edit, existing values in fields ready for update, cookie:",
+            req.session.user
+        );
+    }
+});
+
+app.post("/profile/edit", (req, res) => {
+    console.log(
+        "POST to /edit, cookie at beginning of route:",
+        req.session.user
+    );
+    let id = req.session.user.id;
+    let { first, last, email, password, age, city, url } = req.body;
+
+    if (
+        url != "" &&
+        !url.startsWith("http://") &&
+        !url.startsWith("https://")
+    ) {
+        res.render("profile", {
+            error: true,
+        });
+    } else if (password == "") {
+        db.updateFirstLastEmail(first, last, email, id)
+            .then(() => {
+                console.log("update first, last, email in database");
+                return db.upsertProfile(age || null, city, url, id);
+            })
+            .then(() => {
+                console.log("update age, city, url in database");
+            })
+            .then(() => {
+                let id = req.session.user.id;
+                db.getInfoForUpdate(id).then((result) => {
+                    // console.log("result in getInfoForUpdate:", result);
+                    res.render("edit", {
                         first: result.first,
                         last: result.last,
                         email: result.email,
                         age: result.age,
                         city: result.city,
                         url: result.url,
-                    };
-                // console.log("cookie in GET /edit:", req.session.user);
+                        update: true,
+                    });
+                });
+                console.log(
+                    "POST /edit, update & upsert without password, update-message, cookie:",
+                    req.session.user
+                );
             })
             .catch((err) => {
-                console.log("catch in GET /edit", err);
+                res.render("edit", {
+                    error: true,
+                });
+                console.log(
+                    "POST /edit, catch in update/upsert without password:",
+                    err
+                );
+            });
+    } else {
+        hash(password)
+            .then((hashedPw) => {
+                console.log("POST /edit, hashed password:", hashedPw);
+                return db.updateWithPassword(first, last, email, hashedPw, id);
+            })
+            .then(() => {
+                console.log(
+                    "POST /edit, update first, last, email, password in database"
+                );
+                db.upsertProfile(age || null, city, url, id)
+                    .then(() => {
+                        console.log(
+                            "POST /edit, update age, city, url in database"
+                        );
+                    })
+                    .catch((err) => {
+                        console.log(
+                            "POST /edit, catch in upsert with password:",
+                            err
+                        );
+                    });
+            })
+            .then(() => {
+                let id = req.session.user.id;
+                db.getInfoForUpdate(id).then((result) => {
+                    // console.log("result in getInfoForUpdate:", result);
+                    res.render("edit", {
+                        first: result.first,
+                        last: result.last,
+                        email: result.email,
+                        age: result.age,
+                        city: result.city,
+                        url: result.url,
+                        update: true,
+                    });
+                });
+                console.log(
+                    "POST /edit, update/upsert with password, rendering success, cookie:",
+                    req.session.user
+                );
+            })
+            .catch((err) => {
+                console.log("POST /edit, catch with password:", err);
+                res.render("edit", { error: true });
             });
     }
 });
@@ -209,7 +307,7 @@ app.get("/profile/edit", (req, res) => {
 //////////////////// LOGIN SITE ////////////////////
 
 app.get("/login", (req, res) => {
-    console.log("GET request to login site, cookie:", req.session.user);
+    console.log("GET /login, cookie:", req.session.user);
 
     if (req.session.user) {
         res.redirect("/petition");
@@ -223,10 +321,7 @@ app.post("/login", (req, res) => {
     const email = req.body.email;
     const password = req.body.password;
     req.session.user = {};
-    console.log(
-        "POST request to login site, cookie after {}:",
-        req.session.user
-    );
+    console.log("POST /login, cookie after {}:", req.session.user);
     let id;
 
     if (email != "" && password != "") {
@@ -299,7 +394,7 @@ app.post("/login", (req, res) => {
                 res.render("login", {
                     error: true,
                 });
-                console.log("error in login", err);
+                console.log("POST /login, catch in getHashByEmail:", err);
             });
     } else {
         res.render("login", {
@@ -311,7 +406,7 @@ app.post("/login", (req, res) => {
 
 //////////////////// PETITION SITE ////////////////////
 app.get("/petition", (req, res) => {
-    console.log("GET request to /petition, cookie:", req.session.user);
+    console.log("GET /petition, cookie:", req.session.user);
 
     if (!req.session.user) {
         res.redirect("/register");
@@ -360,7 +455,7 @@ app.post("/petition", (req, res) => {
                 );
             })
             .catch((err) => {
-                console.log("error, no signature:", err);
+                console.log("POST /petition, no signature, catch:", err);
             });
     } else {
         res.render("petition", {
@@ -376,7 +471,7 @@ app.post("/petition", (req, res) => {
 
 app.get("/thanks", (req, res) => {
     console.log(
-        "GET  request to /thanks, cookie at beginning of route:",
+        "GET  /thanks, cookie at beginning of route:",
         req.session.user
     );
     let currentFirstName;
@@ -406,7 +501,10 @@ app.get("/thanks", (req, res) => {
                 // console.log("current first name:", currentFirstName);
             })
             .catch((err) => {
-                console.log("error in getCurrentFirstNameById:", err);
+                console.log(
+                    "GET /thanks, catch in getCurrentFirstNameById:",
+                    err
+                );
             });
 
         db.getNumberOfSignees()
@@ -415,7 +513,7 @@ app.get("/thanks", (req, res) => {
                 // console.log("number of signees:", amountOfSignees);
             })
             .catch((err) => {
-                console.log("error in getNumberOfSignees amount:", err);
+                console.log("GET /thanks, catch in getNumberOfSignees:", err);
             });
 
         let idSig = req.session.user.idSig;
@@ -432,7 +530,10 @@ app.get("/thanks", (req, res) => {
                 });
             })
             .catch((err) => {
-                console.log("error in getCurrentSignatureById:", err);
+                console.log(
+                    "GET /thanks, catch in getCurrentSignatureById:",
+                    err
+                );
             });
         console.log(
             "GET to /thanks, cookie at end of route:",
@@ -441,10 +542,25 @@ app.get("/thanks", (req, res) => {
     }
 });
 
+app.post("/thanks/delete", (req, res) => {
+    let user = req.session.user;
+    db.deleteSignature(user.idSig)
+        .then(() => {
+            delete user.idSig;
+            res.redirect("/petition");
+        })
+        .catch((err) => {
+            console.log("POST /delete signature, error:", err);
+        });
+    console.log(
+        "POST /thanks, signature and idSig deleted, redirect to /petition"
+    );
+});
+
 //////////////////// SIGNERS SITE ////////////////////
 app.get("/signers", (req, res) => {
     console.log(
-        "GET request to /signers, cookie at beginning of route:",
+        "GET /signers, cookie at beginning of route:",
         req.session.user
     );
 
@@ -463,7 +579,7 @@ app.get("/signers", (req, res) => {
         );
     } else {
         // show first and last names, age, cities and homepage of other signees
-        console.log("GET request to /signers with cookie", req.session.user);
+        console.log("GET /signers with cookie", req.session.user);
 
         db.getFullInfoOfSignees()
             .then((results) => {
@@ -475,18 +591,12 @@ app.get("/signers", (req, res) => {
             .catch((err) => {
                 console.log("error in getFullInfoOfSignees:", err);
             });
-        console.log(
-            "GET request to /signers, cookie after catch:",
-            req.session.user
-        );
+        console.log("GET /signers, cookie after catch:", req.session.user);
     }
 });
 
 app.get("/signers/:city", (req, res) => {
-    console.log(
-        "GET request to /city, cookie at beginning of route:",
-        req.session.user
-    );
+    console.log("GET /city, cookie at beginning of route:", req.session.user);
 
     if (!req.session.user) {
         res.redirect("/register");
@@ -503,7 +613,7 @@ app.get("/signers/:city", (req, res) => {
         );
     } else {
         // show first and last names, age and homepage of other signees in the same city
-        console.log("GET request to /city with cookie", req.session.user);
+        console.log("GET /city with cookie", req.session.user);
         const city = req.params.city;
         console.log("city:", city);
 
@@ -515,7 +625,10 @@ app.get("/signers/:city", (req, res) => {
                 // console.log("current first name:", currentFirstName);
             })
             .catch((err) => {
-                console.log("error in getCurrentFirstNameById:", err);
+                console.log(
+                    "GET /city, catch in getCurrentFirstNameById:",
+                    err
+                );
             });
 
         db.getCityOfSignee(city)
@@ -534,12 +647,9 @@ app.get("/signers/:city", (req, res) => {
                 });
             })
             .catch((err) => {
-                console.log("error in getCityOfSignee:", err);
+                console.log("GET /city, catch in getCityOfSignee:", err);
             });
-        console.log(
-            "GET request to /city, cookie after catch:",
-            req.session.user
-        );
+        console.log("GET /city, cookie after catch:", req.session.user);
     }
 });
 

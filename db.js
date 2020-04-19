@@ -62,6 +62,31 @@ module.exports.getInfoForUpdate = (id) => {
         });
 };
 
+module.exports.updateFirstLastEmail = (first, last, email, id) => {
+    return db.query(
+        `UPDATE users SET first = $1, last = $2, email = $3
+        WHERE id = $4`,
+        [first, last, email, id]
+    );
+};
+
+module.exports.updateWithPassword = (first, last, email, password, id) => {
+    return db.query(
+        `UPDATE users SET first = $1, last = $2, email = $3, password = $4
+        WHERE id = $5`,
+        [first, last, email, password, id]
+    );
+};
+
+module.exports.upsertProfile = (age, city, url, user_id) => {
+    return db.query(
+        `INSERT INTO user_profiles (age, city, url, user_id)
+        VALUES ($1, $2, $3, $4)
+        ON CONFLICT (user_id) DO UPDATE SET age = $1, city = $2, url = $3`,
+        [age, city, url, user_id]
+    );
+};
+
 // HAS THE USER SIGNED?
 module.exports.hasUserSigned = (id) => {
     return db.query(`SELECT id FROM signatures WHERE user_id = $1`, [id]);
@@ -115,10 +140,25 @@ module.exports.getNumberOfSignees = () => {
 // RETURN SIGNATURE OF CURRENT/LAST ID
 module.exports.getCurrentSignatureById = (id) => {
     return db
-        .query(`SELECT signature FROM signatures WHERE id = $1`, [id])
+        .query(
+            `SELECT signature
+                FROM signatures
+                WHERE id = $1`,
+            [id]
+        )
         .then((result) => {
             return result.rows[0].signature;
         });
+};
+
+////////////////////////// THANKS //////////////////////////
+module.exports.deleteSignature = (user_id) => {
+    return db.query(
+        `DELETE
+                FROM signatures
+                WHERE user_id = $1`,
+        [user_id]
+    );
 };
 
 ////////////////////////// SIGNEES //////////////////////////

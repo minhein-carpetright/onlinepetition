@@ -3,3 +3,8 @@
 <div>{{amount}} people have signed so far.</div>
 <div>You find the names of all signees <a href="/signers">here</a>.</div>
 <img src="{{currentSig}}" >
+
+<form action="/thanks/delete" method="POST">
+    <button id="deletesignature">Delete my signature</button>
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+</form>
