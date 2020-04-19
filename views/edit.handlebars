@@ -1,0 +1,43 @@
+<div>
+    <h2>Edit my profile</h2>
+
+    {{#if error}}
+        <h4>Something went wrong. Please try again.</h4>
+    {{/if}}
+
+    <form method="POST" id="updatefields">
+        <div id="sevenfields">
+
+            <label for="first">First name</label>
+            <input name="first" type="text" autocomplete="off" value={{first}}>
+
+            <label for="last">Last name</label>
+            <input name="last" type="text" autocomplete="off" value={{last}}>
+
+            <label for="email">Email</label>
+            <input name="email" type="email" autocomplete="off" value={{email}}>
+
+            <label for="pass">Password (8 characters minimum)</label>
+            <input name="password" type="password" minlength="8" required autocomplete="off">
+
+            <label for="age">Age</label>
+            <input name="age" type="number" autocomplete="off" value={{age}}>
+
+            <label for="city">City</label>
+            <input name="city" type="text" autocomplete="off" value={{city}}>
+
+            <label for="url">Homepage (begin with http:// or https://)</label>
+            <input name="url" type="text" autocomplete="off" value={{url}}>
+            {{#if error}}
+                <h4>Your url looks suspicious. Please enter something else or skip this field.</h4>
+            {{/if}}
+
+            <input type="hidden" name="_csrf" value="{{csrfToken}}">
+            <button>Update</button>
+
+        </div>
+    </form>
+
+Nothing to update? Go back to <a href="/login">Login</a>
+
+</div>

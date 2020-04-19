@@ -217,7 +217,7 @@ app.post("/login", (req, res) => {
                 id = result.id;
                 return result.password;
             })
-            // compare hash with login-password
+            // compare hash with login-password:
             .then((hashedPw) => {
                 return compare(password, hashedPw);
             })
@@ -233,8 +233,7 @@ app.post("/login", (req, res) => {
                         "POST to /login, cookie in matchValue after password match in login:",
                         req.session.user
                     );
-                    // res.redirect("/petition"); // WIEDER HERSTELLEN 23:00
-                    console.log("hash and entered password match");
+                    return req.session.user.id;
                 } else {
                     // if matchValue is false -> rerender login with error message
                     res.render("login", {
@@ -249,29 +248,23 @@ app.post("/login", (req, res) => {
             .then(() => {
                 db.hasUserSigned(id)
                     .then((response) => {
-                        // ändern 23:00
-                        console.log("response hasUserSigned:", response);
-                        if (response.id) {
-                            console.log(
-                                "req.session.user before:",
-                                req.session.user
-                            );
-                            req.session.user.idSig = response.id; // set cookie idSig
-                            console.log(
-                                "req.session.user after:",
-                                req.session.user
-                            );
-                            res.redirect("/thanks");
-                            console.log(
-                                "POST /login, cookie idSig set, redirect to /thanks, cookie:",
-                                req.session.user
-                            );
-                        } else {
+                        if (!response.rows[0]) {
                             res.redirect("/petition");
                             console.log(
                                 "POST /login, cookie idSig not there, redirect to /petition, cookie:",
                                 req.session.user
                             );
+                        } else {
+                            console.log(
+                                "POST /login check for signature before set idSig:",
+                                req.session.user
+                            );
+                            req.session.user.idSig = response.rows[0].id; // set cookie idSig
+                            console.log(
+                                "POST /login check for signature after set idSig:",
+                                req.session.user
+                            );
+                            res.redirect("/thanks");
                         }
                     })
                     .catch((err) => {

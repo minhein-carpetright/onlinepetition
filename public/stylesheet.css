@@ -1,4 +1,4 @@
-/* BASIC STRUCTURE OF SITE: HTML, BODY, HEADER */
+/* ///////// BASIC STRUCTURE OF SITE: HTML, BODY, HEADER ///////// */
 * {
     /* width: 100vw; */
     box-sizing: border-box;
@@ -39,7 +39,7 @@ p {
     height: 20px;
 }
 
-/* HEADLINES */
+/* ///////// HEADLINES ///////// */
  {
 }
 
@@ -66,7 +66,7 @@ h2 {
 h3 {
     font-family: "Baloo 2", cursive;
     font-variant: small-caps;
-    color: white;
+    color: black;
     font-size: 30px;
     text-align: center;
     padding: 0;
@@ -91,7 +91,9 @@ h4 {
     }
 }
 
-/* PETITION HANDLEBAR */
+/* ///////// LOGIN ///////// */
+
+/* ///////// PETITION ///////// */
 .clicks {
 }
 
@@ -152,23 +154,45 @@ canvas {
     outline: none;
 }
 
-/* FOOTER */
+/* ///////// FOOTER ///////// */
 footer {
     font-family: "Baloo 2", cursive;
     font-size: 22px;
     color: white;
-    margin-top: 50px;
+    padding-top: 30px;
+    /* margin-top: 50px; */
+    display: inline-block;
+    /* position: relative; */
+    width: 100%;
+    height: 50px;
+    bottom: 0px;
+}
+
+#copyright {
+    /* float: left; */
+    /* width: 50%; */
+    position: absolute;
+    left: 0px;
+    bottom: 0px;
+    font-size: 16px;
+    color: black;
 }
 
 .contact {
-    width: 30%;
-    float: right;
-    text-align: center;
+    /* float: right; */
+    width: 50%;
+    /* right: 10px; */
+    /* padding-left: 50%; */
+    /* padding-left: 550px; */
+    position: absolute;
+    right: 0px;
+    bottom: 0px;
+    /* text-align: center; */
     display: flex;
-    flex-direction: row;
+    /* flex-direction: row; */
     justify-content: space-evenly;
-    align-items: flex-start;
-    align-content: flex-start;
+    /* align-items: flex-start; */
+    /* align-content: flex-start; */
     flex-wrap: wrap;
 }
 
@@ -186,20 +210,4 @@ i.fa.fa-twitter::before {
 #text {
     font-family: "Baloo 2", cursive;
     color: white;
-}
-
-#back {
-    text-align: none;
-    margin: 5px;
-    color: black;
-    /* width: 50%; */
-    /* float: left; */
-}
-
-#copyright {
-    font-size: 16px;
-    color: black;
-    position: absolute;
-    left: 10px;
-    padding-top: 30px;
 }

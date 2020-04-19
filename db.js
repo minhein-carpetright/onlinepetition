@@ -46,15 +46,14 @@ module.exports.getHashByEmail = (email) => {
 
 // HAS THE USER SIGNED?
 module.exports.hasUserSigned = (id) => {
-    return db
-        .query(
-            `
+    return db.query(
+        `
         SELECT id FROM signatures WHERE user_id = $1;`,
-            [id]
-        )
-        .then((result) => {
-            return result.rows[0];
-        });
+        [id]
+    );
+    // .then((result) => {
+    //     return result.rows[0];
+    // });
 };
 
 // module.exports.hasUserSigned = (email) => {
