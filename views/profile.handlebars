@@ -5,16 +5,23 @@ Tell us a little bit about yourself. You don't have to, it's optional.<br>
 
 <form method="POST" id="registerprofile">
     <div id="threefields">
-        <div>Age</div>
-        <input id="age" name="age" placeholder="e.g. 33" type="number" autocomplete="off" />
-        <div>City</div>
-        <input id="city" name="city" placeholder="e.g. Berlin" type="text" autocomplete="off" />
-        <div>Homepage (begin with http:// or https://)</div>
-        <input id="url" name="url" placeholder="e.g. https://algorules.org/" type="text" autocomplete="off" />
-        {{#if error}}
-            <h4>Your url looks suspicious. Please enter something else or skip this field.</h4>
-        {{/if}}
+
+        <label for="age">Age</label>
+        <input name="age" type="number" autocomplete="off" placeholder="e.g. 33" autocomplete="off">
+
+        <label for="city">City</label>
+        <input name="city" type="text" autocomplete="off" placeholder="e.g. Berlin" >
+
+        <label for="url">Homepage (begin with http:// or https://)</label>
+        <input name="url" type="url" autocomplete="off" placeholder="e.g. https://algorules.org/" >
+            {{#if error}}
+                <h4>Your url looks suspicious. Please enter something else or skip this field.</h4>
+            {{/if}}
+
         <input type="hidden" name="_csrf" value="{{csrfToken}}">
+
     </div>
+
     <button id="profile-button">continue</button>
+
 </form>

@@ -4,10 +4,12 @@
 <p>Make sure to let them know about our cause and forward this petition.</p>
 
 <div id="listofnamesincity">
+
     {{#fullInfoCities}}
         {{#if this.url}}<a href='{{this.url}}'>{{/if}}
             {{this.first}} {{this.last}}
         {{#if this.url}}</a>{{/if}}
         {{#if this.age}}   |   {{this.age}}{{/if}}<br>
     {{/fullInfoCities}}
+
 </div>

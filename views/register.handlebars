@@ -3,26 +3,30 @@ Register for a world without algorithmic bias<br>
 Every vote supports the cause for a fair and just ...<br>
 
 {{#if error}}
-    <h4>Something went wrong. Please fill out all 4 fields.</h4>
+    <h4>Something went wrong. Please fill out all 4 fields.<br>
+    You may have also used an email-address already in use. If that is the case, go to <a href="/login">Login</a></h4>
 {{/if}}
 
 <form method="POST" id="registerfields">
     <div id="fourfields">
-        <div>First Name</div>
-        <input id="first" name="first" placeholder="e.g. Jane" type="text" autocomplete="off" />
-        <div>Last Name</div>
-        <input id="last" name="last" placeholder="e.g. Doe" type="text" autocomplete="off" />
-        <div>Email</div>
-        <input id="email-register" name="email" placeholder="e.g. jane@doe.org" type="text" autocomplete="off" />
-        <div>Password</div>
-        <div>
-            <label for="pass">Password (8 characters minimum)</label>
-            <input type="password" id="password-register" name="password"
-           minlength="8" required placeholder="e.g. X8kF3da#V§d" autocomplete="off">
-        </div>
+
+        <label for="first">First name</label>
+        <input name="first" type="text" placeholder="e.g. Jane" autocomplete="off">
+
+        <label for="last">Last name</label>
+        <input name="last" type="text" placeholder="e.g. Doe" autocomplete="off">
+
+        <label for="email">Email</label>
+        <input name="email" type="email" autocomplete="off" placeholder="e.g. jane@doe.org" >
+
+        <label for="pass">Password (8 characters minimum)</label>
+        <input name="password" type="password" minlength="8" required placeholder="e.g. X8kF3da#V§d" autocomplete="off">
+
         <input type="hidden" name="_csrf" value="{{csrfToken}}">
     </div>
+
     <button id="register-button">register</button>
+
 </form>
 
 Already registered? Just <a href="/login">Login</a>

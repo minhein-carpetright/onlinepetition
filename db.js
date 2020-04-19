@@ -25,7 +25,7 @@ module.exports.addProfile = (age, city, url, user_id) => {
         INSERT INTO user_profiles (age, city, url, user_id)
         VALUES ($1, $2, $3, $4)
         RETURNING id;`,
-        [checkAge(age), city, url, user_id]
+        [age, city, url, user_id]
     );
 };
 
@@ -35,9 +35,27 @@ module.exports.getHashByEmail = (email) => {
     return db
         .query(
             `SELECT password, id
-        FROM users
-        WHERE email = $1`,
+            FROM users
+            WHERE email = $1`,
             [email]
+        )
+        .then((result) => {
+            return result.rows[0];
+        });
+};
+
+////////////////////////// UPDATE //////////////////////////
+// RETURN ALL INFO EXCEPT PASSWORD FOR UPDATE-FIELDS
+module.exports.getInfoForUpdate = (id) => {
+    return db
+        .query(
+            `
+            SELECT users.first, users.last, users.email, user_profiles.age, user_profiles.city, user_profiles.url
+            FROM users
+            LEFT OUTER JOIN user_profiles
+            ON users.id = user_profiles.user_id
+            WHERE users.id = $1`,
+            [id]
         )
         .then((result) => {
             return result.rows[0];
@@ -46,14 +64,7 @@ module.exports.getHashByEmail = (email) => {
 
 // HAS THE USER SIGNED?
 module.exports.hasUserSigned = (id) => {
-    return db.query(
-        `
-        SELECT id FROM signatures WHERE user_id = $1;`,
-        [id]
-    );
-    // .then((result) => {
-    //     return result.rows[0];
-    // });
+    return db.query(`SELECT id FROM signatures WHERE user_id = $1`, [id]);
 };
 
 // module.exports.hasUserSigned = (email) => {
@@ -129,7 +140,7 @@ module.exports.getFullInfoOfSignees = () => {
 };
 
 ////////////////////////// CITY //////////////////////////
-// RETURN FIRST AND LAST NAMES, AGE, CITY, URL
+// RETURN FIRST AND LAST NAMES, AGE, CITY, URL IF THERE IS A SIGNATURE
 module.exports.getCityOfSignee = (city) => {
     return db
         .query(

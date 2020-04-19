@@ -129,59 +129,79 @@ app.post("/profile", (req, res) => {
         req.session.user
     );
     let age = req.body.age;
-    // if age is not filled out the databank doesn't store the other values - to prevent this:
-    checkAge = (age) => {
-        if (age == "") {
-            return null;
-        } else {
-            return age;
-        }
-    };
-    // easier solution to the function above: pass as parameter `age || null`
 
     const city = req.body.city;
     const url = req.body.homepage;
     let user_id = req.session.user.id;
     // console.log("user_id:", user_id);
-    // console.log("req.session.user.id:", req.session.user.id);
 
-    if (
-        url != "" &&
-        !url.startsWith("http://") &&
-        !url.startsWith("https://")
-    ) {
-        res.render("profile", {
-            error: true,
+    // if (
+    //     url != "" &&
+    //     !url.startsWith("http://") &&
+    //     !url.startsWith("https://")
+    // ) {
+    //     res.render("profile", {
+    //         error: true,
+    //     });
+    // } else {
+    db.addProfile(age || null, city, url, user_id)
+        .then((response) => {
+            console.log(
+                "POST to /profile, cookie before change:",
+                req.session.user
+            );
+            console.log(
+                "look at what database reveals before setting cookie idProf:",
+                response.rows[0]
+            );
+            req.session.user.idProf = response.rows[0].id; // set cookie "idProf" on id in "user_profiles"
+            console.log("database after cookie is set:", response.rows[0]);
+            console.log(
+                "POST to /profile, cookie after change with idProf:",
+                req.session.user
+            );
+            res.redirect("/petition");
+            console.log(
+                "profile info inserted in database, redirect to /petition:"
+            );
+        })
+        .catch((err) => {
+            res.redirect("/petition");
+            console.log("error in POST /profile, redirect to /petition", err);
         });
+    // }
+});
+
+//////////////////// EDIT SITE ////////////////////
+app.get("/profile/edit", (req, res) => {
+    console.log("GET request to /edit, cookie:", req.session.user);
+    let id = req.session.user.id;
+
+    if (!req.session.user) {
+        res.redirect("/register");
+        console.log(
+            "has no cookie, redirect from /edit to /register, cookie:",
+            req.session.user
+        );
     } else {
-        db.addProfile(age, city, url, user_id)
-            .then((response) => {
-                console.log(
-                    "POST to /profile, cookie before change:",
-                    req.session.user
-                );
-                console.log(
-                    "look at what database reveals before setting cookie idProf:",
-                    response.rows[0]
-                );
-                req.session.user.idProf = response.rows[0].id; // set cookie "idProf" on id in "user_profiles"
-                // req.session.user.idProf = user_id; // set cookie "idProf" on user_id in "user_profiles"
-                console.log("database after cookie is set:", response.rows[0]);
-                console.log(
-                    "POST to /profile, cookie after change with idProf:",
-                    req.session.user
-                );
-                res.redirect("/petition");
-                console.log(
-                    "profile info inserted in database, redirect to /petition:"
-                );
+        db.getInfoForUpdate(id)
+            .then((result) => {
+                console.log("result in getInfoForUpdate:", result);
+                console.log("result.first:", result.first);
+                res.render("edit"),
+                    {
+                        result,
+                        first: result.first,
+                        last: result.last,
+                        email: result.email,
+                        age: result.age,
+                        city: result.city,
+                        url: result.url,
+                    };
+                // console.log("cookie in GET /edit:", req.session.user);
             })
             .catch((err) => {
-                res.redirect("/petition");
-                console.log(
-                    "error in POST /profile, redirect to /petition",
-                    err
-                );
+                console.log("catch in GET /edit", err);
             });
     }
 });
