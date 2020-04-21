@@ -1,8 +1,8 @@
-<div class="navbar"><a href="/petitiontext">Petition</a>  |  <a href="/profile/edit">Edit Profile</a>  |  <a href="/logout">Logout</a></div>
-<div class="placeholder"></div>
+<div class="heart">{ <3 }</div>
 <div class="placeholder"></div>
 
-{{> shortexpl}}
+<div class="navbar"><a href="/petitiontext">Petition</a>  |  <a href="/profile/edit">Edit Profile</a>  |  <a href="/logout">Logout</a></div>
+<div class="placeholder"></div>
 
 <h3>{{cfn}}, thank you for joining the cause against algorithmic bias!</h3>
 <p class="center"><img id="sigonthanks" src="{{currentSig}}" ></p>
@@ -18,3 +18,5 @@
     <button>Delete my signature</button>
     <input type="hidden" name="_csrf" value="{{csrfToken}}">
 </form>
+
+<div class="error">{ error }</div>

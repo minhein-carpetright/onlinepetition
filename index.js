@@ -358,20 +358,7 @@ app.post("/login", (req, res) => {
             })
             .then((matchValue) => {
                 console.log("match value of compare:", matchValue); // true or false
-                if (matchValue === false) {
-                    // if matchValue is false -> rerender login with error message
-                    // res.render("login", { error: true });
-                    res.render("login", {
-                        errorpassword: true,
-                    });
-                    console.log(
-                        "POST /login, hash and password do not match, rerender /login with error message, cookie:",
-                        req.session.user
-                    );
-                    // return;
-                    // console.log("should have ended here");
-                    // throw Error;
-                } else {
+                if (matchValue) {
                     console.log(
                         "POST /login, cookie in matchValue before:",
                         req.session.user
@@ -382,31 +369,20 @@ app.post("/login", (req, res) => {
                         req.session.user
                     );
                     return req.session.user.id;
+                } else {
+                    // if matchValue is false -> rerender login with error message
+                    res.render("login", {
+                        error: true,
+                        // errorpassword: true,
+                    });
+                    console.log(
+                        "POST /login, hash and password do not match, rerender /login with error message, cookie:",
+                        req.session.user
+                    );
+                    // res.redirect("/login");
+                    // return;
+                    // throw Error;
                 }
-                // if (matchValue === true) {
-                //     console.log(
-                //         "POST /login, cookie in matchValue before:",
-                //         req.session.user
-                //     );
-                //     req.session.user.id = id;
-                //     console.log(
-                //         "POST /login, cookie in matchValue after password match in login:",
-                //         req.session.user
-                //     );
-                //     return req.session.user.id;
-                // } else {
-                //     // if matchValue is false -> rerender login with error message
-                //     // res.render("login", { error: true });
-                //     res.render("login", {
-                //         errorpassword: true,
-                //     });
-                //     console.log(
-                //         "POST /login, hash and password do not match, rerender /login with error message, cookie:",
-                //         req.session.user
-                //     );
-                //     return;
-                //     // throw Error;
-                // }
             })
             // check for signature:
             .then(() => {
@@ -425,7 +401,7 @@ app.post("/login", (req, res) => {
                             );
                             req.session.user.idSig = response.rows[0].id; // set cookie idSig
                             console.log(
-                                "POST /login check for signature after set idSig:",
+                                "POST /login check for signature after set idSig, redirect to /thanks:",
                                 req.session.user
                             );
                             res.redirect("/thanks");
@@ -436,9 +412,13 @@ app.post("/login", (req, res) => {
                             "POST /login, catch in hasUserSigned:",
                             err
                         );
+                        // res.redirect("/login");
+                        res.render("login", {
+                            error: true,
+                        });
                     });
             })
-            // if matchValue is false -> rerender
+            // if matchValue is false --> rerender
             .catch((err) => {
                 res.render("login", {
                     error: true,
@@ -521,7 +501,7 @@ app.post("/petition", (req, res) => {
 
 app.get("/petitiontext", (req, res) => {
     console.log(
-        "GET  /petitiontext, cookie at beginning of route:",
+        "GET /petitiontext, cookie at beginning of route:",
         req.session.user
     );
     let user = req.session.user;

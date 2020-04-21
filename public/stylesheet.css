@@ -17,6 +17,8 @@ body {
 
 header {
     height: 130px;
+    /* background: url("/code-background.jpg") 100% 100% no-repeat; */
+    margin: 0;
 }
 
 main {
@@ -181,6 +183,98 @@ a:hover,
 .navbar {
     word-spacing: 10px;
     text-align: center;
+}
+
+/* ///////// GRAPHICS ///////// */
+.heart {
+    width: 60%;
+    height: 100px;
+    color: white;
+    background-color: black;
+    font-size: 80px;
+    opacity: 80%;
+    text-align: center;
+    border-radius: 20px 20px 0 0;
+    margin: 0 20%;
+    overflow: hidden;
+}
+
+.error {
+    width: 60%;
+    height: 100px;
+    color: white;
+    background-color: black;
+    font-size: 80px;
+    opacity: 80%;
+    text-align: center;
+    border-radius: 0 0 20px 20px;
+    margin: 0 20%;
+    overflow: hidden;
+}
+
+.forward {
+    width: 60%;
+    height: 100px;
+    color: white;
+    background-color: black;
+    font-size: 80px;
+    opacity: 80%;
+    text-align: center;
+    border-radius: 0 0 20px 20px;
+    margin: 0 20%;
+    overflow: hidden;
+}
+
+.break {
+    width: 60%;
+    height: 100px;
+    color: white;
+    background-color: black;
+    font-size: 80px;
+    opacity: 80%;
+    text-align: center;
+    border-radius: 20px 20px 0 0;
+    margin: 0 20%;
+    overflow: hidden;
+}
+
+.breakbottom {
+    width: 60%;
+    height: 100px;
+    color: white;
+    background-color: black;
+    font-size: 80px;
+    opacity: 80%;
+    text-align: center;
+    border-radius: 0 0 20px 20px;
+    margin: 0 20%;
+    overflow: hidden;
+}
+
+.than {
+    width: 60%;
+    height: 100px;
+    color: white;
+    background-color: black;
+    font-size: 80px;
+    opacity: 80%;
+    text-align: center;
+    border-radius: 0 0 20px 20px;
+    margin: 0 20%;
+    overflow: hidden;
+}
+
+.thantop {
+    width: 60%;
+    height: 100px;
+    color: white;
+    background-color: black;
+    font-size: 80px;
+    opacity: 80%;
+    text-align: center;
+    border-radius: 20px 20px 0 0;
+    margin: 0 20%;
+    overflow: hidden;
 }
 
 /* ///////// LOGIN ///////// */

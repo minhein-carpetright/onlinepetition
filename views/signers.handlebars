@@ -1,3 +1,6 @@
+<div class="thantop">{ < > }</div>
+<div class="placeholder"></div>
+
 <div class="navbar"><a href="/petitiontext">Petition</a>  |  <a href="/thanks">My Signature</a>  |  <a href="/profile/edit">Edit Profile</a>  |  <a href="/logout">Logout</a></div>
 <div class="placeholder"></div>
 <div class="placeholder"></div>
@@ -8,9 +11,12 @@
 
 <p class="listofnames">
     {{#fullInfo}}
-        {{#if this.url}}<a href='{{this.url}}' target="_blank">{{/if}}{{this.first}} {{this.last}}{{#if this.url}}</a>{{/if}}{{#if this.age}}   |   {{this.age}}{{/if}}{{#if this.city}}   |   <a href='/signers/{{this.city}}' target="_blank">{{this.city}}</a>{{/if}}<br>
+        {{#if this.url}}<a href='{{this.url}}' target="_blank">{{/if}}{{this.first}} {{this.last}}{{#if this.url}}</a>{{/if}}{{#if this.age}}   |   {{this.age}}{{/if}}{{#if this.city}}   |   <a href='/signers/{{this.city}}'>{{this.city}}</a>{{/if}}<br>
     {{/fullInfo}}
 
 <div class="placeholder"></div>
 </p>
 <p>If you click on the city you will see all signees in that city.</p>
+
+<div class="placeholder"></div>
+<div class="forward">{ ;\> }</div>
