@@ -174,8 +174,7 @@ a {
     text-align: center;
 }
 
-a:hover,
-.hyperlinkblue {
+a:hover {
     color: blue;
     text-decoration: underline blue;
 }
@@ -186,84 +185,25 @@ a:hover,
 }
 
 /* ///////// GRAPHICS ///////// */
-.heart {
-    width: 60%;
-    height: 100px;
-    color: white;
-    background-color: black;
-    font-size: 80px;
-    opacity: 80%;
-    text-align: center;
+.heart,
+.break,
+.thantop {
     border-radius: 20px 20px 0 0;
-    margin: 0 20%;
-    overflow: hidden;
 }
 
-.error {
-    width: 60%;
-    height: 100px;
-    color: white;
-    background-color: black;
-    font-size: 80px;
-    opacity: 80%;
-    text-align: center;
-    border-radius: 0 0 20px 20px;
-    margin: 0 20%;
-    overflow: hidden;
-}
-
-.forward {
-    width: 60%;
-    height: 100px;
-    color: white;
-    background-color: black;
-    font-size: 80px;
-    opacity: 80%;
-    text-align: center;
-    border-radius: 0 0 20px 20px;
-    margin: 0 20%;
-    overflow: hidden;
-}
-
-.break {
-    width: 60%;
-    height: 100px;
-    color: white;
-    background-color: black;
-    font-size: 80px;
-    opacity: 80%;
-    text-align: center;
-    border-radius: 20px 20px 0 0;
-    margin: 0 20%;
-    overflow: hidden;
-}
-
-.breakbottom {
-    width: 60%;
-    height: 100px;
-    color: white;
-    background-color: black;
-    font-size: 80px;
-    opacity: 80%;
-    text-align: center;
-    border-radius: 0 0 20px 20px;
-    margin: 0 20%;
-    overflow: hidden;
-}
-
+.error,
+.forward,
+.breakbottom,
 .than {
-    width: 60%;
-    height: 100px;
-    color: white;
-    background-color: black;
-    font-size: 80px;
-    opacity: 80%;
-    text-align: center;
     border-radius: 0 0 20px 20px;
-    margin: 0 20%;
-    overflow: hidden;
 }
 
+.heart,
+.error,
+.forward,
+.break,
+.breakbottom,
+.than,
 .thantop {
     width: 60%;
     height: 100px;
@@ -272,7 +212,6 @@ a:hover,
     font-size: 80px;
     opacity: 80%;
     text-align: center;
-    border-radius: 20px 20px 0 0;
     margin: 0 20%;
     overflow: hidden;
 }
