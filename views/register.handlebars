@@ -1,32 +1,47 @@
-short context info about petition<br>
-Register for a world without algorithmic bias<br>
-Every vote supports the cause for a fair and just ...<br>
+{{> shortexpl}}
+
+<p>Every vote supports the cause for a fair and just society.</p>
+<p>Register now and sign for a world without algorithmic bias.</p>
+<div class="placeholder"></div>
+<div class="placeholder"></div>
 
 {{#if error}}
     <h4>Something went wrong. Please fill out all 4 fields.<br>
-    You may have also used an email-address already in use. If that is the case, go to <a href="/login">Login</a></h4>
+    <div class="placeholder"></div>
+    You may have also used an email-address already in use. If that is the case, go to <a class="hyperlinkblue" href="/login">Login</a></h4>
+    <div class="placeholder"></div>
 {{/if}}
 
 <form method="POST" id="registerfields">
+
     <div id="fourfields">
 
-        <label for="first">First name</label>
-        <input name="first" type="text" placeholder="e.g. Jane" autocomplete="off">
+        <div>
+            <label for="first">First name</label><br>
+            <input name="first" type="text" placeholder="e.g. Jane" autocomplete="off">
+        </div>
 
-        <label for="last">Last name</label>
-        <input name="last" type="text" placeholder="e.g. Doe" autocomplete="off">
+        <div>
+            <label for="last">Last name</label><br>
+            <input name="last" type="text" placeholder="e.g. Doe" autocomplete="off">
+        </div>
 
-        <label for="email">Email</label>
-        <input name="email" type="email" autocomplete="off" placeholder="e.g. jane@doe.org" >
+        <div>
+            <label for="email">Email</label><br>
+            <input name="email" type="email" autocomplete="off" placeholder="e.g. jane@doe.org" >
+        </div>
 
-        <label for="pass">Password (8 characters minimum)</label>
-        <input name="password" type="password" minlength="8" required placeholder="e.g. X8kF3da#V§d" autocomplete="off">
+        <div>
+            <label for="pass">Password (min. 8 characters)</label><br>
+            <input name="password" type="password" minlength="8" required placeholder="e.g. X8kF3da#V§d" autocomplete="off">
+        </div>
 
         <input type="hidden" name="_csrf" value="{{csrfToken}}">
+
     </div>
 
-    <button id="register-button">register</button>
+    <button>register</button>
 
 </form>
 
-Already registered? Just <a href="/login">Login</a>
+<p>Already registered? Just <a class="hyperlinkblue" href="/login">Login</a></p>

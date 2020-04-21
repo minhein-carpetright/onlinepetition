@@ -1,4 +1,8 @@
-<h2>Login</h2>
+{{> shortexpl}}
+
+<p>Not yet registered? Do it <a class="hyperlinkblue" href="/register">here</a> now!</p>
+
+<h3>Login</h3>
 
 {{#if error}}
     <h4>Something went wrong.<br>Please enter both your email-address and password.</h4>
@@ -8,23 +12,22 @@
     <h4>Your password does not match your email-address.<br>Please try again.</h4>
 {{/if}}
 
-short context info about petition<br>
-Register for a world without algorithmic bias<br>
-Every vote supports the cause for a fair and just ...<br>
-
 <form method="POST" id="loginfields">
     <div id="twofields">
-        <label for="email">Email</label>
-        <input name="email" type="email" autocomplete="off" placeholder="e.g. jane@doe.org" >
 
-        <label for="pass">Password (8 characters minimum)</label>
-        <input name="password" type="password" minlength="8" required placeholder="e.g. X8kF3da#V§d" autocomplete="off">
+        <div>
+            <label for="email">Email</label><br>
+            <input name="email" type="email" autocomplete="off">
+        </div>
+
+        <div>
+            <label for="pass">Password (8 characters minimum)</label><br>
+            <input name="password" type="password" minlength="8" required autocomplete="off">
+        </div>
 
         <input type="hidden" name="_csrf" value="{{csrfToken}}">
     </div>
 
-    <button id="login-button">login</button>
+    <button>login</button>
 
 </form>
-
-Not yet registered? Do it now! <a href="/register">Register</a>

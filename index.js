@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+// exports.app = app;
 const hb = require("express-handlebars");
 const cookieSession = require("cookie-session");
 const { addEntry } = require("./db.js");
@@ -7,6 +8,12 @@ const db = require("./db.js");
 const csurf = require("csurf");
 const { hash, compare } = require("./bc");
 const helmet = require("helmet");
+// const {
+//     requireSignature,
+//     requireNoSignature,
+//     requireLoggedOutUser,
+// } = require("/.middleware");
+// const profileRouter = require("./routes/profile");
 
 //////////////////// HANDLEBARS BOILERPLATE ////////////////////
 app.engine("handlebars", hb());
@@ -35,6 +42,15 @@ app.use((req, res, next) => {
     res.locals.csrfToken = req.csrfToken();
     next();
 });
+
+// app.use((req, res, next) => {
+//     console.log("I am running on every request!");
+//     if (!req.session.user && req.url != "/register" && req.url != "/login") {
+//         res.redirect("/register");
+//     } else {
+//         next();
+//     }
+// });
 
 app.use(express.static("./public"));
 
@@ -309,11 +325,15 @@ app.post("/profile/edit", (req, res) => {
 app.get("/login", (req, res) => {
     console.log("GET /login, cookie:", req.session.user);
 
-    if (req.session.user) {
-        res.redirect("/petition");
-        console.log("has cookie, redirect from /login to /petition");
-    } else {
+    if (!req.session.user) {
         res.render("login");
+        console.log("GET /login, render /login, no cookie:", req.session.user);
+    } else {
+        res.redirect("/petition");
+        console.log(
+            "has cookie, redirect from /login to /petition, cookie:",
+            req.session.user
+        );
     }
 });
 
@@ -340,12 +360,12 @@ app.post("/login", (req, res) => {
                 console.log("match value of compare:", matchValue); // true or false
                 if (matchValue) {
                     console.log(
-                        "POST to /login, cookie in matchValue before:",
+                        "POST /login, cookie in matchValue before:",
                         req.session.user
                     );
                     req.session.user.id = id;
                     console.log(
-                        "POST to /login, cookie in matchValue after password match in login:",
+                        "POST /login, cookie in matchValue after password match in login:",
                         req.session.user
                     );
                     return req.session.user.id;
@@ -466,6 +486,33 @@ app.post("/petition", (req, res) => {
     }
 });
 
+//////////////////// PETITION-TEXT SITE ////////////////////
+
+app.get("/petitiontext", (req, res) => {
+    console.log(
+        "GET  /petitiontext, cookie at beginning of route:",
+        req.session.user
+    );
+    let user = req.session.user;
+
+    if (!req.session.user) {
+        res.redirect("/register");
+        console.log(
+            "no cookie, redirect from GET /petitiontext to /register, cookie:",
+            req.session.user
+        );
+        let idSig = req.session.user.idSig;
+    } else if (!req.session.user.idSig) {
+        res.redirect("/petition");
+        console.log(
+            "GET /petitiontext, has not signed, redirect to /petition, cookie:",
+            req.session.user
+        );
+    } else {
+        res.render("petitiontext");
+    }
+});
+
 //////////////////// THANKS SITE ////////////////////
 // thank signee and show number of signees and signature
 
@@ -542,11 +589,16 @@ app.get("/thanks", (req, res) => {
     }
 });
 
+// DELETE SIGNATURE
 app.post("/thanks/delete", (req, res) => {
     let user = req.session.user;
-    db.deleteSignature(user.idSig)
+    db.deleteSignature(user.id)
         .then(() => {
             delete user.idSig;
+            console.log(
+                "req.session.user after idSig got deleted:",
+                req.session.user
+            );
             res.redirect("/petition");
         })
         .catch((err) => {
@@ -594,6 +646,8 @@ app.get("/signers", (req, res) => {
         console.log("GET /signers, cookie after catch:", req.session.user);
     }
 });
+
+//////////////////// CITY SITE ////////////////////
 
 app.get("/signers/:city", (req, res) => {
     console.log("GET /city, cookie at beginning of route:", req.session.user);
@@ -653,10 +707,20 @@ app.get("/signers/:city", (req, res) => {
     }
 });
 
+//////////////////// LOGOUT ////////////////////
+
+app.get("/logout", (req, res) => {
+    req.session = null;
+    res.redirect("/login");
+});
+
 app.use(function (req, res, next) {
     res.status(404).send("sorry can't find that, 404");
 });
 
-app.listen(process.env.PORT || 8080, () =>
-    console.log("petition server is listening")
-);
+// run only when index.js is run by node, not by jest/supertest:
+if (require.main === module) {
+    app.listen(process.env.PORT || 8080, () =>
+        console.log("petition server is listening")
+    );
+}

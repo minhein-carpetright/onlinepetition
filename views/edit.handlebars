@@ -1,47 +1,64 @@
-<div>
-    <h3>Profile Edit</h3>
+{{!-- {{> shortexpl}} --}}
 
-    {{#if error}}
-        <h4>Something went wrong. Please try again.</h4>
-    {{/if}}
+<div class="navbar"><a href="/petitiontext">Petition</a>  |  <a href="/thanks">My Signature</a>  |  <a href="/signers">Other Signees</a>  |  <a href="/logout">Logout</a></div>
 
-    <form method="POST" id="updatefields">
-        <div id="sevenfields">
+{{#if update}}
+    <h4>Your profile is updated.</h4>
+{{/if}}
 
-            <label for="first">First name</label>
-            <input name="first" type="text" autocomplete="off" value="{{first}}"><br>
 
-            <label for="last">Last name</label>
-            <input name="last" type="text" autocomplete="off" value="{{last}}"><br>
+<h3>Edit Profile</h3>
 
-            <label for="email">Email</label>
-            <input name="email" type="email" autocomplete="off" value="{{email}}"><br>
+{{#if error}}
+    <h4>Something went wrong. Please try again.</h4>
+{{/if}}
 
-            <label for="pass">Password (8 characters minimum)</label>
-            <input name="password" type="password" minlength="8" autocomplete="off"><br>
+<form method="POST" id="updatefields">
+    <div id="sevenfields">
 
-            <label for="age">Age</label>
-            <input name="age" type="number" autocomplete="off" value="{{age}}"><br>
-
-            <label for="city">City</label>
-            <input name="city" type="text" autocomplete="off" value="{{city}}"><br>
-
-            <label for="url">Homepage (begin with http:// or https://)</label>
-            <input name="url" type="url" autocomplete="off" value="{{url}}"><br>
-            {{#if errorurl}}
-                <h4>Your url looks suspicious. Please enter something else or skip this field.</h4>
-            {{/if}}
-
-            <input type="hidden" name="_csrf" value="{{csrfToken}}">
-            <button>Update</button>
-
+        <div>
+            <label for="first">First name</label><br>
+            <input name="first" type="text" autocomplete="off" value="{{first}}">
         </div>
-    </form>
 
-            {{#if update}}
-                <h4>Your profile is updated.</h4>
-            {{/if}}
+        <div>
+            <label id="labellast" for="last">Last name</label><br>
+            <input id="inputlast" name="last" type="text" autocomplete="off" value="{{last}}">
+        </div>
 
-Nothing to update? Go back to <a href="/login">Login</a>
+        <div>
+            <label for="email">Email</label><br>
+            <input name="email" type="email" autocomplete="off" value="{{email}}">
+        </div>
 
-</div>
+        <div>
+            <label for="pass">Password (min. 8 characters)</label><br>
+            <input name="password" type="password" minlength="8" autocomplete="off">
+        </div>
+
+        <div>
+            <label for="age">Age</label><br>
+            <input name="age" type="number" autocomplete="off" value="{{age}}">
+        </div>
+
+        <div>
+            <label for="city">City</label><br>
+            <input name="city" type="text" autocomplete="off" value="{{city}}">
+        </div>
+
+        <div class="homepage">
+            <label for="url">Homepage (begin with http:// or https://)</label><br>
+            <input name="url" type="url" autocomplete="off" value="{{url}}">
+        </div>
+
+        {{#if errorurl}}
+            <h4>Your url looks suspicious. Please enter something else or skip this field.</h4>
+        {{/if}}
+
+    </div>
+
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+
+    <button>Update</button>
+
+</form>

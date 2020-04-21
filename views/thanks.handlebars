@@ -1,5 +1,13 @@
 <h3>Thank you for joining our cause, {{cfn}}!</h3>
 
+{{> shortexpl}}
+
+<div class="nav">
+    <div><a href="/logout">Logout</a></div>
+    <div><a href="/profile/edit">Edit Profile</a></div>
+    <div><a href="/petitiontext">Text of Petition</a></div>
+</div>
+
 <div>{{amount}} people have signed so far.</div>
 <div>You find the names of all signees <a href="/signers">here</a>.</div>
 <img src="{{currentSig}}" >

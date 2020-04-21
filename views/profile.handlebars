@@ -1,27 +1,37 @@
-short context info about petition<br>
-Register for a world without algorithmic bias<br>
-Every vote supports the cause for a fair and just ...<br><br>
-Tell us a little bit about yourself. You don't have to, it's optional.<br>
+{{> shortexpl}}
 
-<form method="POST" id="registerprofile">
+<h3>Profile</h3>
+
+<p>Tell us a little bit about yourself. You don't have to, it's optional.</p>
+<div class="placeholder"></div>
+<div class="placeholder"></div>
+
+<form method="POST">
     <div id="threefields">
 
-        <label for="age">Age</label>
-        <input name="age" type="number" autocomplete="off" placeholder="e.g. 33" autocomplete="off">
+        <div>
+            <label for="age">Age</label><br>
+            <input name="age" type="number" autocomplete="off" placeholder="e.g. 33" autocomplete="off">
+        </div>
 
-        <label for="city">City</label>
-        <input name="city" type="text" autocomplete="off" placeholder="e.g. Berlin" >
+        <div>
+            <label for="city">City</label><br>
+            <input name="city" type="text" autocomplete="off" placeholder="e.g. Berlin" >
+        </div>
 
-        <label for="url">Homepage (begin with http:// or https://)</label>
-        <input name="url" type="url" autocomplete="off" placeholder="e.g. https://algorules.org/" >
-            {{#if error}}
-                <h4>Your url looks suspicious. Please enter something else or skip this field.</h4>
-            {{/if}}
+        <div class="homepage">
+            <label for="url">Homepage (begin with http:// or https://)</label><br>
+            <input name="url" type="url" autocomplete="off" placeholder="e.g. https://algorules.org/" >
+        </div>
+
+        {{#if error}}
+            <h4>Your url looks suspicious. Please enter something else or skip this field.</h4>
+        {{/if}}
 
         <input type="hidden" name="_csrf" value="{{csrfToken}}">
 
     </div>
 
-    <button id="profile-button">continue</button>
+    <button>continue</button>
 
 </form>
