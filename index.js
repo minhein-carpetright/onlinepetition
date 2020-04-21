@@ -144,7 +144,7 @@ app.post("/profile", (req, res) => {
     let age = req.body.age;
 
     const city = req.body.city;
-    const url = req.body.homepage;
+    const url = req.body.url;
     let user_id = req.session.user.id;
 
     // if (
@@ -358,7 +358,20 @@ app.post("/login", (req, res) => {
             })
             .then((matchValue) => {
                 console.log("match value of compare:", matchValue); // true or false
-                if (matchValue) {
+                if (matchValue === false) {
+                    // if matchValue is false -> rerender login with error message
+                    // res.render("login", { error: true });
+                    res.render("login", {
+                        errorpassword: true,
+                    });
+                    console.log(
+                        "POST /login, hash and password do not match, rerender /login with error message, cookie:",
+                        req.session.user
+                    );
+                    // return;
+                    // console.log("should have ended here");
+                    // throw Error;
+                } else {
                     console.log(
                         "POST /login, cookie in matchValue before:",
                         req.session.user
@@ -369,15 +382,31 @@ app.post("/login", (req, res) => {
                         req.session.user
                     );
                     return req.session.user.id;
-                } else {
-                    // if matchValue is false -> rerender login with error message
-                    res.render("login", {
-                        errorpassword: true,
-                    });
-                    console.log(
-                        "error in login, hash and password do not match"
-                    );
                 }
+                // if (matchValue === true) {
+                //     console.log(
+                //         "POST /login, cookie in matchValue before:",
+                //         req.session.user
+                //     );
+                //     req.session.user.id = id;
+                //     console.log(
+                //         "POST /login, cookie in matchValue after password match in login:",
+                //         req.session.user
+                //     );
+                //     return req.session.user.id;
+                // } else {
+                //     // if matchValue is false -> rerender login with error message
+                //     // res.render("login", { error: true });
+                //     res.render("login", {
+                //         errorpassword: true,
+                //     });
+                //     console.log(
+                //         "POST /login, hash and password do not match, rerender /login with error message, cookie:",
+                //         req.session.user
+                //     );
+                //     return;
+                //     // throw Error;
+                // }
             })
             // check for signature:
             .then(() => {
@@ -420,7 +449,9 @@ app.post("/login", (req, res) => {
         res.render("login", {
             error: true,
         });
-        console.log("2 input fields on /login not complete");
+        console.log(
+            "2 input fields on /login not complete or falsy, rerender /login with error message"
+        );
     }
 });
 

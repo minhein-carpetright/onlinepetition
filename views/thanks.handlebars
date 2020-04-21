@@ -1,18 +1,20 @@
-<h3>Thank you for joining our cause, {{cfn}}!</h3>
+<div class="navbar"><a href="/petitiontext">Petition</a>  |  <a href="/profile/edit">Edit Profile</a>  |  <a href="/logout">Logout</a></div>
+<div class="placeholder"></div>
+<div class="placeholder"></div>
 
 {{> shortexpl}}
 
-<div class="nav">
-    <div><a href="/logout">Logout</a></div>
-    <div><a href="/profile/edit">Edit Profile</a></div>
-    <div><a href="/petitiontext">Text of Petition</a></div>
-</div>
+<h3>{{cfn}}, thank you for joining the cause against algorithmic bias!</h3>
+<p class="center"><img id="sigonthanks" src="{{currentSig}}" ></p>
+<p class="center">{{amount}} people have signed so far.</p>
+<p class="center">You find the names of all signees <a href="/signers">here</a>.</p>
 
-<div>{{amount}} people have signed so far.</div>
-<div>You find the names of all signees <a href="/signers">here</a>.</div>
-<img src="{{currentSig}}" >
+<div class="placeholder"></div>
+<div class="placeholder"></div>
+<div class="placeholder"></div>
+<div class="placeholder"></div>
 
 <form action="/thanks/delete" method="POST">
-    <button id="deletesignature">Delete my signature</button>
+    <button>Delete my signature</button>
     <input type="hidden" name="_csrf" value="{{csrfToken}}">
 </form>

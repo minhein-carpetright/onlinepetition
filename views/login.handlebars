@@ -5,11 +5,13 @@
 <h3>Login</h3>
 
 {{#if error}}
-    <h4>Something went wrong.<br>Please enter both your email-address and password.</h4>
+    <h4>Something went wrong.<br>
+    Please enter both your email-address and correct password.</h4>
 {{/if}}
 
 {{#if errorpassword}}
-    <h4>Your password does not match your email-address.<br>Please try again.</h4>
+    <h4>Your password does not match your email-address.<br>
+    Please try again.</h4>
 {{/if}}
 
 <form method="POST" id="loginfields">

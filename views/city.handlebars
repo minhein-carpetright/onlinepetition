@@ -1,15 +1,24 @@
+<div class="navbar"><a href="/petitiontext">Petition</a>  |  <a href="/thanks">My Signature</a>  | <a href="/signers">Other Signees</a>  | 
+  <a href="/profile/edit">Edit Profile</a>  |  <a href="/logout">Logout</a></div>
+<div class="placeholder"></div>
+<div class="placeholder"></div>
+
+{{> shortexpl}}
+<div class="placeholder"></div>
+<div class="placeholder"></div>
+
 <p>Hey {{cfn}},</p>
-<p>those are the people in <b>{{toUpperCase city}}</b> who support our petition against algorithmic bias.</p>
-<p>Do you know anyone from there who still hasn't signed?</p>
+<p>below are the people in <b>{{toUpperCase city}}</b> who support our petition against algorithmic bias.</p>
+<p>Do you know anybody else from there who still hasn't signed?</p>
 <p>Make sure to let them know about our cause and forward this petition.</p>
+<div class="placeholder"></div>
+<div class="placeholder"></div>
 
-<div id="listofnamesincity">
-
+<p class="listofnames">
     {{#fullInfoCities}}
-        {{#if this.url}}<a href='{{this.url}}'>{{/if}}
+        {{#if this.url}}<a href='{{this.url}}' target="_blank">{{/if}}
             {{this.first}} {{this.last}}
         {{#if this.url}}</a>{{/if}}
         {{#if this.age}}   |   {{this.age}}{{/if}}<br>
     {{/fullInfoCities}}
-
-</div>
+</p>
