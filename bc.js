@@ -9,7 +9,3 @@ compare = promisify(compare); // takes two arguments, a plain text and a hash co
 module.exports.compare = compare;
 module.exports.hash = (plainTxtPw) =>
     genSalt().then((salt) => hash(plainTxtPw, salt));
-
-module.exports.compare = compare;
-module.exports.hash = (plainTxtPw) =>
-    genSalt().then((salt) => hash(plainTxtPw, salt));

@@ -147,41 +147,44 @@ app.post("/profile", (req, res) => {
     const url = req.body.url;
     let user_id = req.session.user.id;
 
-    // if (
-    //     url != "" &&
-    //     !url.startsWith("http://") &&
-    //     !url.startsWith("https://")
-    // ) {
-    //     res.render("profile", {
-    //         error: true,
-    //     });
-    // } else {
-    db.addProfile(age || null, city, url, user_id)
-        .then((response) => {
-            console.log(
-                "POST to /profile, cookie before change:",
-                req.session.user
-            );
-            console.log(
-                "look at what database reveals before setting cookie idProf:",
-                response.rows[0]
-            );
-            req.session.user.idProf = response.rows[0].id; // set cookie "idProf" on id in "user_profiles"
-            console.log("database after cookie is set:", response.rows[0]);
-            console.log(
-                "POST to /profile, cookie after change with idProf:",
-                req.session.user
-            );
-            res.redirect("/petition");
-            console.log(
-                "profile info inserted in database, redirect to /petition:"
-            );
-        })
-        .catch((err) => {
-            res.redirect("/petition");
-            console.log("POST /profile, redirect to /petition, catch:", err);
+    if (
+        url != "" &&
+        !url.startsWith("http://") &&
+        !url.startsWith("https://")
+    ) {
+        res.render("profile", {
+            error: true,
         });
-    // }
+    } else {
+        db.addProfile(age || null, city, url, user_id)
+            .then((response) => {
+                console.log(
+                    "POST to /profile, cookie before change:",
+                    req.session.user
+                );
+                console.log(
+                    "look at what database reveals before setting cookie idProf:",
+                    response.rows[0]
+                );
+                req.session.user.idProf = response.rows[0].id; // set cookie "idProf" on id in "user_profiles"
+                console.log("database after cookie is set:", response.rows[0]);
+                console.log(
+                    "POST to /profile, cookie after change with idProf:",
+                    req.session.user
+                );
+                res.redirect("/petition");
+                console.log(
+                    "profile info inserted in database, redirect to /petition:"
+                );
+            })
+            .catch((err) => {
+                res.redirect("/petition");
+                console.log(
+                    "POST /profile, redirect to /petition, catch:",
+                    err
+                );
+            });
+    }
 });
 
 //////////////////// EDIT SITE ////////////////////
@@ -226,13 +229,39 @@ app.post("/profile/edit", (req, res) => {
     let id = req.session.user.id;
     let { first, last, email, password, age, city, url } = req.body;
 
+    if (first == "" || last == "" || email == "") {
+        let id = req.session.user.id;
+        db.getInfoForUpdate(id).then((result) => {
+            res.render("edit", {
+                error: true,
+                first: result.first,
+                last: result.last,
+                email: result.email,
+                age: result.age,
+                city: result.city,
+                url: result.url,
+            });
+            console.log("index.js /edit, first/last or email empty");
+        });
+    }
+
     if (
         url != "" &&
         !url.startsWith("http://") &&
         !url.startsWith("https://")
     ) {
-        res.render("profile", {
-            error: true,
+        let id = req.session.user.id;
+        db.getInfoForUpdate(id).then((result) => {
+            res.render("edit", {
+                errorUrl: true,
+                first: result.first,
+                last: result.last,
+                email: result.email,
+                age: result.age,
+                city: result.city,
+                url: result.url,
+            });
+            console.log("index.js /edit, bad url");
         });
     } else if (password == "") {
         db.updateFirstLastEmail(first, last, email, id)
@@ -368,57 +397,48 @@ app.post("/login", (req, res) => {
                         "POST /login, cookie in matchValue after password match in login:",
                         req.session.user
                     );
+                    db.hasUserSigned(id)
+                        .then((response) => {
+                            if (!response.rows[0]) {
+                                res.redirect("/petition");
+                                console.log(
+                                    "POST /login, cookie idSig not there, redirect to /petition, cookie:",
+                                    req.session.user
+                                );
+                            } else {
+                                console.log(
+                                    "POST /login check for signature before set idSig:",
+                                    req.session.user
+                                );
+                                req.session.user.idSig = response.rows[0].id;
+                                console.log(
+                                    "POST /login check for signature after set idSig, redirect to /thanks:",
+                                    req.session.user
+                                );
+                                res.redirect("/thanks");
+                            }
+                        })
+                        .catch((err) => {
+                            console.log(
+                                "POST /login, catch in hasUserSigned:",
+                                err
+                            );
+                            res.render("login", {
+                                error: true,
+                            });
+                        });
                     return req.session.user.id;
                 } else {
                     // if matchValue is false -> rerender login with error message
                     res.render("login", {
-                        error: true,
-                        // errorpassword: true,
+                        errorPassword: true,
                     });
                     console.log(
                         "POST /login, hash and password do not match, rerender /login with error message, cookie:",
                         req.session.user
                     );
-                    // res.redirect("/login");
-                    // return;
-                    // throw Error;
                 }
             })
-            // check for signature:
-            .then(() => {
-                db.hasUserSigned(id)
-                    .then((response) => {
-                        if (!response.rows[0]) {
-                            res.redirect("/petition");
-                            console.log(
-                                "POST /login, cookie idSig not there, redirect to /petition, cookie:",
-                                req.session.user
-                            );
-                        } else {
-                            console.log(
-                                "POST /login check for signature before set idSig:",
-                                req.session.user
-                            );
-                            req.session.user.idSig = response.rows[0].id; // set cookie idSig
-                            console.log(
-                                "POST /login check for signature after set idSig, redirect to /thanks:",
-                                req.session.user
-                            );
-                            res.redirect("/thanks");
-                        }
-                    })
-                    .catch((err) => {
-                        console.log(
-                            "POST /login, catch in hasUserSigned:",
-                            err
-                        );
-                        // res.redirect("/login");
-                        res.render("login", {
-                            error: true,
-                        });
-                    });
-            })
-            // if matchValue is false --> rerender
             .catch((err) => {
                 res.render("login", {
                     error: true,

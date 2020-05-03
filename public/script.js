@@ -24,6 +24,7 @@ canvas
             let x = e.clientX - offset.left;
             let y = e.clientY - offset.top;
             ctx.strokeStyle = "blue";
+            ctx.lineWidth = 5;
             ctx.lineTo(x, y);
             ctx.stroke();
         }
