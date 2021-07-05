@@ -9,6 +9,7 @@ const db = spicedPg(
 
 // INSERT FIRST AND LAST NAME, EMAIL AND PASSWORD INTO DATABASE "USERS"
 module.exports.addUser = (first, last, email, password) => {
+    console.log("DB:", first, last, email, password);
     return db.query(
         `
     INSERT INTO users (first, last, email, password)

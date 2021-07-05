@@ -70,12 +70,35 @@ app.post("/register", (req, res) => {
     let password = req.body.password;
     req.session.user = {};
 
+    console.log(
+        "first:",
+        first,
+        "last:",
+        last,
+        "email:",
+        email,
+        "password:",
+        password
+    );
+
     if (first != "" && last != "" && email != "" && password != "") {
+        console.log(
+            "first:",
+            first,
+            "last:",
+            last,
+            "email:",
+            email,
+            "password:",
+            password
+        );
         hash(password)
             .then((hashedPw) => {
+                console.log("hashed password:", hashedPw);
                 return db.addUser(first, last, email, hashedPw);
             })
             .then((response) => {
+                console.log("response:", response);
                 req.session.user = {
                     id: response.rows[0].id,
                 };
