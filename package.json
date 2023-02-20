@@ -1,38 +1,37 @@
 {
-    "name": "petition",
-    "version": "1.0.0",
-    "main": "index.js",
-    "scripts": {
-        "test": "jest",
-        "start": "node index.js"
-    },
-    "engines": {
-        "node": "10.15.3"
-    },
-    "author": "",
-    "license": "ISC",
-    "dependencies": {
-        "bcryptjs": "^2.4.3",
-        "cookie-parser": "^1.4.3",
-        "cookie-session": "^2.0.0-alpha.1",
-        "csurf": "^1.9.0",
-        "express": "^4.14.0",
-        "express-handlebars": "^3.0.0",
-        "helmet": "^3.22.0",
-        "jest": "^25.1.0",
-        "redis": "^3.1.2",
-        "spiced-pg": "^1.0.0",
-        "supertest": "^4.0.2"
-    },
-    "devDependencies": {},
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/andy-9/petition.git"
-    },
-    "keywords": [],
-    "bugs": {
-        "url": "https://github.com/andy-9/petition/issues"
-    },
-    "homepage": "https://github.com/andy-9/petition#readme",
-    "description": ""
+  "name": "petition",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "start": "node index.js"
+  },
+  "engines": {
+    "node": "10.15.3"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.3",
+    "cookie-session": "^2.0.0-alpha.1",
+    "csurf": "^1.9.0",
+    "express": "^4.14.0",
+    "express-handlebars": "^3.0.0",
+    "helmet": "^3.22.0",
+    "jest": "^25.1.0",
+    "spiced-pg": "^1.0.0",
+    "supertest": "^4.0.2"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/andy-9/petition.git"
+  },
+  "keywords": [],
+  "bugs": {
+    "url": "https://github.com/andy-9/petition/issues"
+  },
+  "homepage": "https://github.com/andy-9/petition#readme",
+  "description": ""
 }

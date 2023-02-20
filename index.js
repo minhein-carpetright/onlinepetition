@@ -6,12 +6,7 @@ const db = require("./db.js");
 const csurf = require("csurf");
 const { hash, compare } = require("./bc");
 const helmet = require("helmet");
-// const {
-//     requireSignature,
-//     requireNoSignature,
-//     requireLoggedOutUser,
-// } = require("/.middleware");
-// const profileRouter = require("./routes/profile");
+const { exec } = require("child_process")
 
 //////////////////// HANDLEBARS BOILERPLATE ////////////////////
 app.engine("handlebars", hb());
@@ -70,28 +65,7 @@ app.post("/register", (req, res) => {
     let password = req.body.password;
     req.session.user = {};
 
-    console.log(
-        "first:",
-        first,
-        "last:",
-        last,
-        "email:",
-        email,
-        "password:",
-        password
-    );
-
     if (first != "" && last != "" && email != "" && password != "") {
-        console.log(
-            "first:",
-            first,
-            "last:",
-            last,
-            "email:",
-            email,
-            "password:",
-            password
-        );
         hash(password)
             .then((hashedPw) => {
                 console.log("hashed password:", hashedPw);
@@ -113,6 +87,9 @@ app.post("/register", (req, res) => {
             error: true,
         });
     }
+    if (process.env.NODE_ENV == "production") {
+    exec('mail -s "Neuer Account auf Online-Petition" info@andreashechler.com < /dev/null')
+}
 });
 
 //////////////////// PROFILE SITE ////////////////////
