@@ -20,4 +20,4 @@ module.exports.requireLoggedOutUser = (req, res, next) {
     } else {
         next();
     }
-}
+};
